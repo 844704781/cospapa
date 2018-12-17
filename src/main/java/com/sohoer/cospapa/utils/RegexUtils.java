@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 public class RegexUtils {
 
     private static String DATE = "\\b[0-9]{4}-[0-1][0-2]-[0-3][0-9]\\b";
-    private static String NAME = "\\/([a-z]*)\\/$";
+    private static String NAME = "\\/([\\d\\w]*)\\/$";
 
     /**
      * 根据正则regex去字符串content中过滤
@@ -55,8 +55,8 @@ public class RegexUtils {
 
 
     public static void main(String[] args) {
-        System.out.println(getDate("更新于：2018-11-19 <em>1.0</em>"));
-        String str="http://www.gufengmh.com/manhua/aojiaowangyetainanzhui/";
+        //System.out.println(getDate("更新于：2018-11-19 <em>1.0</em>"));
+        String str="http://www.gufengmh.com/manhua/zhegechashengbutaiLow234/";
         System.out.println(getBookName(str));;
     }
 
