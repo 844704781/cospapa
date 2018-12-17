@@ -17,6 +17,7 @@ public class Comic {
     private String name;
     private String cn;
     private String cover;
+    private String profile;
     private Date updateTime;
     private Date createTime;
     private Boolean isDeleted;

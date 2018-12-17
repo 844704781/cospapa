@@ -24,13 +24,26 @@ public class CaptureUtils {
         //获取所有漫画
         String url = baseURL + Action.List;
         List<Map<String, String>> list = getAllComics(url);
-        System.out.println(list);
-        //获取所有漫画类型
-
+        //System.out.println(list);
+        //获取所有的简介,漫画类型
+        list.stream().forEach(map -> {
+            String profile = getProfile(map.get("name"));
+            map.put("profile", profile);
+        });
         //将漫画归类
 
+    }
 
+    /**
+     * 根据书名找简介
+     *
+     * @param bookName
+     * @return
+     */
+    public static String getProfile(String bookName) {
+        String detailURL = baseURL + Action.List + bookName + "/";
 
+        return null;
     }
 
     /**
@@ -87,6 +100,7 @@ public class CaptureUtils {
             object.put("href", a.attr("href"));
             object.put("coverSrc", imgEle.attr("src"));
             object.put("updateTime", RegexUtils.getDate(updateon.text()));
+            object.put("name", RegexUtils.getBookName(a.attr("href")));
             comicList.add(object);
         });
         return comicList;
