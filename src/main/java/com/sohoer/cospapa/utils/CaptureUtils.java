@@ -1,6 +1,5 @@
 package com.sohoer.cospapa.utils;
 
-import com.sohoer.cospapa.entity.Comic;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -22,9 +21,15 @@ public class CaptureUtils {
     }
 
     public static void main(String[] args) throws IOException {
+        //获取所有漫画
         String url = baseURL + Action.List;
         List<Map<String, String>> list = getAllComics(url);
         System.out.println(list);
+        //获取所有漫画类型
+
+        //将漫画归类
+
+
 
     }
 
@@ -81,7 +86,7 @@ public class CaptureUtils {
             object.put("cn", a.attr("title"));
             object.put("href", a.attr("href"));
             object.put("coverSrc", imgEle.attr("src"));
-            //object.put("updateTime", RegexUtils.getDate(updateon.text()).get(0));
+            object.put("updateTime", RegexUtils.getDate(updateon.text()));
             comicList.add(object);
         });
         return comicList;
