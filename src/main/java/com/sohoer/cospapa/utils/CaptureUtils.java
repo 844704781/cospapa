@@ -38,7 +38,7 @@ public class CaptureUtils {
             System.out.println("进度:" + (i / count * 100) + "%");
             if (map == null) {
                 list.remove(i);
-                i=i-1;
+                i = i - 1;
                 count = Float.parseFloat(String.valueOf(list.size()));
             }
         }
@@ -53,7 +53,7 @@ public class CaptureUtils {
             } catch (Exception e) {
                 System.err.println("出问题的map:");
                 System.out.println(map);
-                System.out.println("出问题的索引位置:"+i);
+                System.out.println("出问题的索引位置:" + i);
                 e.printStackTrace();
             }
             System.out.println("进度:" + (i / count * 100) + "%");
@@ -61,21 +61,25 @@ public class CaptureUtils {
         System.out.println("获取漫画内容地址成功");
         System.out.println("开始获取漫画内容");
         //下载
-        for (int i = 0; i < list.size(); i++) {
-            Map<String, Object> map = list.get(i);
-            List<Map<String, Object>> chapterList = (List<Map<String, Object>>) map.get("chapter");
-            String bookName = (String) map.get("cn");
-            for (int j = 0; j < chapterList.size(); j++) {
-                Map<String, Object> chapter = chapterList.get(j);
-                List<String> pathList = (List<String>) chapter.get("path");
-                String chapterName = (String) chapter.get("title");
-                for (int k = 0; k < pathList.size(); k++) {
-                    String path = pathList.get(k);
-                    String filePath = comicPath + "\\" + bookName + "\\" + chapterName + "\\" + (k + 1) + ".jpg";
-                    System.out.println(filePath);
-                    //IOUtils.downloadImage(path,filePath);
+        try {
+            for (int i = 0; i < list.size(); i++) {
+                Map<String, Object> map = list.get(i);
+                List<Map<String, Object>> chapterList = (List<Map<String, Object>>) map.get("chapter");
+                String bookName = (String) map.get("cn");
+                for (int j = 0; j < chapterList.size(); j++) {
+                    Map<String, Object> chapter = chapterList.get(j);
+                    List<String> pathList = (List<String>) chapter.get("path");
+                    String chapterName = (String) chapter.get("title");
+                    for (int k = 0; k < pathList.size(); k++) {
+                        String path = pathList.get(k);
+                        String filePath = comicPath + "\\" + bookName + "\\" + chapterName + "\\" + (k + 1) + ".jpg";
+                        System.out.println(filePath);
+                        IOUtils.downloadImage(path, filePath);
+                    }
                 }
             }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         System.out.println("获取漫画内容成功");
 
@@ -97,23 +101,25 @@ public class CaptureUtils {
 
             //漫画详情页面地址
             String href = (String) chapter.get("href");
-            Document doc = null;
-            try {
-                doc = Jsoup.connect(href).get();
-                Elements elements = doc.getElementsByTag("script");
-                String scriptString = elements.get(2).toString();
-                String chapterPath = RegexUtils.getChapterPath(scriptString);
-                List<String> contentImages = RegexUtils.getImage(scriptString);
-                for (int i = 0; i < contentImages.size(); i++) {
-                    contentImages.set(i, imgBaseURL + "/" + chapterPath + contentImages.get(i));
+            if (href != null) {
+                Document doc = null;
+                try {
+                    doc = Jsoup.connect(href).get();
+                    Elements elements = doc.getElementsByTag("script");
+                    String scriptString = elements.get(2).toString();
+                    String chapterPath = RegexUtils.getChapterPath(scriptString);
+                    List<String> contentImages = RegexUtils.getImage(scriptString);
+                    for (int i = 0; i < contentImages.size(); i++) {
+                        contentImages.set(i, imgBaseURL + "/" + chapterPath + contentImages.get(i));
+                    }
+
+                    chapter.put("path", contentImages);
+
+                } catch (IOException e) {
+                    System.out.println("出问题的map:");
+                    System.out.println(list);
+                    e.printStackTrace();
                 }
-
-                chapter.put("path", contentImages);
-
-            } catch (IOException e) {
-                System.out.println("出问题的map:");
-                System.out.println(list);
-                e.printStackTrace();
             }
         });
         return list;
@@ -145,8 +151,11 @@ public class CaptureUtils {
             lis.stream().forEach(li -> {
                 Map<String, Object> chapter = new HashMap<>();
 
+                //章节路径
                 Element a = li.getElementsByTag("a").first();
-                chapter.put("href", CaptureUtils.baseURL + a.attr("href"));
+                if (RegexUtils.validateChapterDetailPath(a.attr("href"))) {
+                    chapter.put("href", CaptureUtils.baseURL + a.attr("href"));
+                }
                 String chapterTitle = li.getElementsByTag("span").first().text();
                 chapter.put("title", chapterTitle);
                 list.add(chapter);
