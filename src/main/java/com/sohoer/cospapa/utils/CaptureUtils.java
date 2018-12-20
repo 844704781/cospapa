@@ -13,9 +13,10 @@ import java.util.Map;
 
 public class CaptureUtils {
 
-
     private static String baseURL = "http://www.gufengmh.com";
-    private static String imgBaseURL="http://res.gufengmh.com";
+    private static String imgBaseURL = "http://res.gufengmh.com";
+    private static String comicPath = "C:\\Users\\watermelon\\Documents\\comic";
+    private static Float count = null;
 
     public static class Action {
         private static String SEARCH = "/search/";
@@ -26,62 +27,96 @@ public class CaptureUtils {
         //获取所有漫画
         String url = baseURL + Action.List;
         List<Map<String, Object>> list = getAllComics(url);
+        count = Float.parseFloat(String.valueOf(list.size()));
         //System.out.println(list);
         //获取所有的简介,章节
-        System.out.println("漫画总数:"+list.size());
-        for(int i=0;i<list.size();i++)
-        {
-            Map<String,Object>map=list.get(i);
+        System.out.println("漫画总数:" + list.size());
+        System.out.println("开始获取漫画章节和简介");
+        for (int i = 0; i < list.size(); i++) {
+            Map<String, Object> map = list.get(i);
             map = captureProfileAndChapters(map);
-            if(true)
-            {
-                break;
+            System.out.println("进度:" + (i / count * 100) + "%");
+            if (map == null) {
+                list.remove(i);
+                i=i-1;
+                count = Float.parseFloat(String.valueOf(list.size()));
             }
         }
+        System.out.println("获取漫画章节和简介成功");
+        System.out.println("开始获取漫画内容地址");
         //异步获取漫画内容
-        for(int i=0;i<list.size();i++)
-        {
-            Map<String,Object>map=list.get(i);
+        for (int i = 0; i < list.size(); i++) {
+            Map<String, Object> map = list.get(i);
             //获取漫画内容
-            getContent(map);
-
-            if(true){
-                break;
+            try {
+                map.put("chapter", getContent((List<Map<String, Object>>) map.get("chapter")));
+            } catch (Exception e) {
+                System.err.println("出问题的map:");
+                System.out.println(map);
+                System.out.println("出问题的索引位置:"+i);
+                e.printStackTrace();
+            }
+            System.out.println("进度:" + (i / count * 100) + "%");
+        }
+        System.out.println("获取漫画内容地址成功");
+        System.out.println("开始获取漫画内容");
+        //下载
+        for (int i = 0; i < list.size(); i++) {
+            Map<String, Object> map = list.get(i);
+            List<Map<String, Object>> chapterList = (List<Map<String, Object>>) map.get("chapter");
+            String bookName = (String) map.get("cn");
+            for (int j = 0; j < chapterList.size(); j++) {
+                Map<String, Object> chapter = chapterList.get(j);
+                List<String> pathList = (List<String>) chapter.get("path");
+                String chapterName = (String) chapter.get("title");
+                for (int k = 0; k < pathList.size(); k++) {
+                    String path = pathList.get(k);
+                    String filePath = comicPath + "\\" + bookName + "\\" + chapterName + "\\" + (k + 1) + ".jpg";
+                    System.out.println(filePath);
+                    //IOUtils.downloadImage(path,filePath);
+                }
             }
         }
-        //下载
+        System.out.println("获取漫画内容成功");
 
-        System.out.println(list.get(0));
+        //System.out.println(list.get(0));
         //获取所有漫画类型
 
         //将漫画归类
 
     }
 
-    public static void getContent(Map<String,Object>map){
-        List<Map<String,Object>>list= (List<Map<String, Object>>) map.get("chapter");
-        list.stream().forEach(chapter->{
+    /**
+     * 根据章节list获取内容地址
+     *
+     * @param list
+     * @return
+     */
+    public static List<Map<String, Object>> getContent(List<Map<String, Object>> list) {
+        list.stream().forEach(chapter -> {
 
             //漫画详情页面地址
-            String href=(String)chapter.get("href");
-            Document doc=null;
+            String href = (String) chapter.get("href");
+            Document doc = null;
             try {
-                doc=Jsoup.connect(href).get();
-                Elements elements=doc.getElementsByTag("script");
-                String scriptString=elements.get(2).toString();
-                String chapterPath =RegexUtils.getChapterPath(scriptString);
-                List<String>contentImages=RegexUtils.getImage(scriptString);
-                for(int i=0;i<contentImages.size();i++)
-                {
-                    contentImages.set(i,imgBaseURL+"/"+chapterPath+contentImages.get(i));
+                doc = Jsoup.connect(href).get();
+                Elements elements = doc.getElementsByTag("script");
+                String scriptString = elements.get(2).toString();
+                String chapterPath = RegexUtils.getChapterPath(scriptString);
+                List<String> contentImages = RegexUtils.getImage(scriptString);
+                for (int i = 0; i < contentImages.size(); i++) {
+                    contentImages.set(i, imgBaseURL + "/" + chapterPath + contentImages.get(i));
                 }
 
-                chapter.put("path",contentImages);
+                chapter.put("path", contentImages);
 
             } catch (IOException e) {
+                System.out.println("出问题的map:");
+                System.out.println(list);
                 e.printStackTrace();
             }
         });
+        return list;
     }
 
     /**
@@ -90,31 +125,35 @@ public class CaptureUtils {
      * @param map
      * @return
      */
-    public static Map<String,Object> captureProfileAndChapters(Map<String,Object> map) {
-        Document doc=null;
+    public static Map<String, Object> captureProfileAndChapters(Map<String, Object> map) {
+        Document doc = null;
 
-        try{
-            doc= Jsoup.connect((String)map.get("href")).get();
-            Element div=doc.getElementById("intro-all");
-            Element p=div.getElementsByTag("p").first();
-            String content=p.text();
-            String [] contents=content.split("：");
-            map.put("profile",contents[1]);
-            Element ul=doc.getElementById("chapter-list-1");
-            Elements lis=ul.getElementsByTag("li");
-            List<Map<String,Object>>list=new ArrayList<>();
-            lis.stream().forEach(li->{
-                 Map<String,Object>chapter=new HashMap<>();
+        try {
 
-                 Element a=li.getElementsByTag("a").first();
-                 chapter.put("href",CaptureUtils.baseURL+a.attr("href"));
-                 String chapterTitle=li.getElementsByTag("span").first().text();
-                 chapter.put("title",chapterTitle);
-                 list.add(chapter);
+            doc = Jsoup.connect((String) map.get("href")).get();
+            Element div = doc.getElementById("intro-all");
+            Element p = div.getElementsByTag("p").first();
+            String content = p.text();
+            String[] contents = content.split("：");
+            map.put("profile", contents[1]);
+            Element ul = doc.getElementById("chapter-list-1");
+            if (ul == null) {
+                return null;
+            }
+            Elements lis = ul.getElementsByTag("li");
+            List<Map<String, Object>> list = new ArrayList<>();
+            lis.stream().forEach(li -> {
+                Map<String, Object> chapter = new HashMap<>();
+
+                Element a = li.getElementsByTag("a").first();
+                chapter.put("href", CaptureUtils.baseURL + a.attr("href"));
+                String chapterTitle = li.getElementsByTag("span").first().text();
+                chapter.put("title", chapterTitle);
+                list.add(chapter);
             });
-            map.put("chapter",list);
+            map.put("chapter", list);
             return map;
-        }catch (IOException ex){
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
 
@@ -177,9 +216,21 @@ public class CaptureUtils {
             object.put("coverSrc", imgEle.attr("src"));
             object.put("updateTime", RegexUtils.getDate(updateon.text()));
             object.put("name", RegexUtils.getBookName(a.attr("href")));
-            object.put("key",key);
+            object.put("key", key);
             comicList.add(object);
         });
         return comicList;
+    }
+
+    public static void main1(String[] args) {
+        String str = "<ul id=\"chapter-list-1\" data-sort=\"asc\"> \n"
+                + " <li> <a href=\"/manhua/ailisijiadenvpuxiaojie/653683.html\" class=\"active\"> <span>短篇</span> </a> </li> \n"
+                + "</ul>";
+        Document doc = Jsoup.parse(str);
+
+        Element ul = doc.getElementById("chapter-list-1");
+
+        Elements lis = ul.getElementsByTag("li");
+        System.out.println(lis);
     }
 }

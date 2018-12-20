@@ -54,9 +54,11 @@
             <version>1.11.3</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
+            <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
+            <version>2.5</version>
         </dependency>
+
     </dependencies>
 
     <build>
