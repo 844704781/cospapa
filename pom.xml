@@ -53,6 +53,10 @@
             <artifactId>jsoup</artifactId>
             <version>1.11.3</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

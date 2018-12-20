@@ -13,7 +13,9 @@ import java.util.Map;
 
 public class CaptureUtils {
 
+
     private static String baseURL = "http://www.gufengmh.com";
+    private static String imgBaseURL="http://res.gufengmh.com";
 
     public static class Action {
         private static String SEARCH = "/search/";
@@ -25,8 +27,8 @@ public class CaptureUtils {
         String url = baseURL + Action.List;
         List<Map<String, Object>> list = getAllComics(url);
         //System.out.println(list);
-        //获取所有的简介
-        System.out.println(list.size());
+        //获取所有的简介,章节
+        System.out.println("漫画总数:"+list.size());
         for(int i=0;i<list.size();i++)
         {
             Map<String,Object>map=list.get(i);
@@ -36,21 +38,50 @@ public class CaptureUtils {
                 break;
             }
         }
-        //System.out.println(list.get(0));
         //异步获取漫画内容
         for(int i=0;i<list.size();i++)
         {
             Map<String,Object>map=list.get(i);
-            String href=(String)map.get("href");
-            System.out.println(href);
+            //获取漫画内容
+            getContent(map);
+
             if(true){
                 break;
             }
         }
+        //下载
+
+        System.out.println(list.get(0));
         //获取所有漫画类型
 
         //将漫画归类
 
+    }
+
+    public static void getContent(Map<String,Object>map){
+        List<Map<String,Object>>list= (List<Map<String, Object>>) map.get("chapter");
+        list.stream().forEach(chapter->{
+
+            //漫画详情页面地址
+            String href=(String)chapter.get("href");
+            Document doc=null;
+            try {
+                doc=Jsoup.connect(href).get();
+                Elements elements=doc.getElementsByTag("script");
+                String scriptString=elements.get(2).toString();
+                String chapterPath =RegexUtils.getChapterPath(scriptString);
+                List<String>contentImages=RegexUtils.getImage(scriptString);
+                for(int i=0;i<contentImages.size();i++)
+                {
+                    contentImages.set(i,imgBaseURL+"/"+chapterPath+contentImages.get(i));
+                }
+
+                chapter.put("path",contentImages);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     /**
@@ -71,9 +102,9 @@ public class CaptureUtils {
             map.put("profile",contents[1]);
             Element ul=doc.getElementById("chapter-list-1");
             Elements lis=ul.getElementsByTag("li");
-            List<Map<String,String>>list=new ArrayList<>();
+            List<Map<String,Object>>list=new ArrayList<>();
             lis.stream().forEach(li->{
-                 Map<String,String>chapter=new HashMap<>();
+                 Map<String,Object>chapter=new HashMap<>();
 
                  Element a=li.getElementsByTag("a").first();
                  chapter.put("href",CaptureUtils.baseURL+a.attr("href"));
@@ -139,12 +170,14 @@ public class CaptureUtils {
             Element imgEle = bookEle.getElementsByTag("img").first();
             Element a = bookEle.getElementsByTag("a").first();
             Element updateon = bookEle.getElementsByClass("updateon").first();
+            String key = bookEle.attr("data-key");
             Map<String, Object> object = new HashMap<>();
             object.put("cn", a.attr("title"));
             object.put("href", a.attr("href"));
             object.put("coverSrc", imgEle.attr("src"));
             object.put("updateTime", RegexUtils.getDate(updateon.text()));
             object.put("name", RegexUtils.getBookName(a.attr("href")));
+            object.put("key",key);
             comicList.add(object);
         });
         return comicList;
