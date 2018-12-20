@@ -24,7 +24,7 @@ public class IOUtils {
 
     public static void main(String[]args){
         String href="http://res.gufengmh.com/images/comic/332/663954/1544783035EYQuLIxLNLvmko0k.jpg";
-        String dir="C:\\Users\\watermelon\\Documents\\comic\\a\\1544783035EYQuLIxLNLvmko0k.jpg";
+        String dir="C:/Users/watermelon/Documents/comic/a/1544783035EYQuLIxLNLvmko0k.jpg";
         downloadImage(href,dir);
     }
 }

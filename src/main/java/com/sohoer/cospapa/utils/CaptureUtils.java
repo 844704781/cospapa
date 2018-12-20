@@ -1,10 +1,15 @@
 package com.sohoer.cospapa.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,9 +20,15 @@ public class CaptureUtils {
 
     private static String baseURL = "http://www.gufengmh.com";
     private static String imgBaseURL = "http://res.gufengmh.com";
-    //private static String comicPath = "C:\\Users\\watermelon\\Documents\\comic";
-    private static String comicPath="/home/watermelon/comic";
+    private static String comicPath = "C:/Users/watermelon/Documents/comic";
+    //private static String comicPath="/home/watermelon/comic";
     private static Float count = null;
+
+    private static String comisJson=comicPath+"/comics.json";
+    private static String captureProfileAndChaptersJson=comicPath+"/captureProfileAndChapters.json";
+    private static String contentJson=comicPath+"/content.json";
+
+    private static Gson gson= new GsonBuilder().create();
 
     public static class Action {
         private static String SEARCH = "/search/";
@@ -27,37 +38,70 @@ public class CaptureUtils {
     public static void main(String[] args) throws IOException {
         //获取所有漫画
         String url = baseURL + Action.List;
-        List<Map<String, Object>> list = getAllComics(url);
+        List<Map<String, Object>> list = null;
+        File comisJsonFile=new File(comisJson);
+        if(!comisJsonFile.exists())
+        {
+            list=getAllComics(url);
+            FileUtils.writeStringToFile(comisJsonFile,gson.toJson(list
+                    ,new TypeToken<List<Map<String, Object>>>(){}.getType()),"UTF-8");
+        }else{
+            list=gson.fromJson(FileUtils.readFileToString(comisJsonFile,"UTF-8")
+                    ,new TypeToken<List<Map<String, Object>>>(){}.getType());
+        }
+
         count = Float.parseFloat(String.valueOf(list.size()));
         //System.out.println(list);
         //获取所有的简介,章节
         System.out.println("漫画总数:" + list.size());
         System.out.println("开始获取漫画章节和简介");
-        for (int i = 0; i < list.size(); i++) {
-            Map<String, Object> map = list.get(i);
-            map = captureProfileAndChapters(map);
-            System.out.println("进度:" + (i / count * 100) + "%");
-            if (map == null) {
-                list.remove(i);
-                i = i - 1;
-                count = Float.parseFloat(String.valueOf(list.size()));
+
+
+        File captureProfileAndChaptersJsonFile=new File(captureProfileAndChaptersJson);
+        if(!captureProfileAndChaptersJsonFile.exists())
+        {
+            for (int i = 0; i < list.size(); i++) {
+                Map<String, Object> map = list.get(i);
+                map = captureProfileAndChapters(map);
+                System.out.println("进度:" + (i / count * 100) + "%");
+                if (map == null) {
+                    list.remove(i);
+                    i = i - 1;
+                    count = Float.parseFloat(String.valueOf(list.size()));
+                }
             }
+            FileUtils.writeStringToFile(captureProfileAndChaptersJsonFile,gson.toJson(list
+                    ,new TypeToken<List<Map<String, Object>>>(){}.getType()),"UTF-8");
+        }else{
+            list=gson.fromJson(FileUtils.readFileToString(captureProfileAndChaptersJsonFile,"UTF-8")
+                    ,new TypeToken<List<Map<String, Object>>>(){}.getType());
         }
+
         System.out.println("获取漫画章节和简介成功");
         System.out.println("开始获取漫画内容地址");
         //异步获取漫画内容
-        for (int i = 0; i < list.size(); i++) {
-            Map<String, Object> map = list.get(i);
-            //获取漫画内容
-            try {
-                map.put("chapter", getContent((List<Map<String, Object>>) map.get("chapter")));
-            } catch (Exception e) {
-                System.err.println("出问题的map:");
-                System.out.println(map);
-                System.out.println("出问题的索引位置:" + i);
-                e.printStackTrace();
+
+        File contentJsonFile=new File(contentJson);
+        if(!contentJsonFile.exists())
+        {
+            for (int i = 0; i < list.size(); i++) {
+                Map<String, Object> map = list.get(i);
+                //获取漫画内容
+                try {
+                    map.put("chapter", getContent((List<Map<String, Object>>) map.get("chapter")));
+                } catch (Exception e) {
+                    System.err.println("出问题的map:");
+                    System.out.println(map);
+                    System.out.println("出问题的索引位置:" + i);
+                    e.printStackTrace();
+                }
+                System.out.println("进度:" + (i / count * 100) + "%");
             }
-            System.out.println("进度:" + (i / count * 100) + "%");
+            FileUtils.writeStringToFile(contentJsonFile,gson.toJson(list
+                    ,new TypeToken<List<Map<String, Object>>>(){}.getType()),"UTF-8");
+        }else{
+            list=gson.fromJson(FileUtils.readFileToString(contentJsonFile,"UTF-8")
+                    ,new TypeToken<List<Map<String, Object>>>(){}.getType());
         }
         System.out.println("获取漫画内容地址成功");
         System.out.println("开始获取漫画内容");
@@ -73,7 +117,7 @@ public class CaptureUtils {
                     String chapterName = (String) chapter.get("title");
                     for (int k = 0; k < pathList.size(); k++) {
                         String path = pathList.get(k);
-                        String filePath = comicPath + "\\" + bookName + "\\" + chapterName + "\\" + (k + 1) + ".jpg";
+                        String filePath = comicPath + "/" + bookName + "/" + chapterName + "/" + (k + 1) + ".jpg";
                         System.out.println(filePath);
                         IOUtils.downloadImage(path, filePath);
                     }
