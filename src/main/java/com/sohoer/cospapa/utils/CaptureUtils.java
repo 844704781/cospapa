@@ -15,7 +15,8 @@ public class CaptureUtils {
 
     private static String baseURL = "http://www.gufengmh.com";
     private static String imgBaseURL = "http://res.gufengmh.com";
-    private static String comicPath = "C:\\Users\\watermelon\\Documents\\comic";
+    //private static String comicPath = "C:\\Users\\watermelon\\Documents\\comic";
+    private static String comicPath="/home/watermelon/comic";
     private static Float count = null;
 
     public static class Action {
@@ -77,6 +78,7 @@ public class CaptureUtils {
                         IOUtils.downloadImage(path, filePath);
                     }
                 }
+                System.out.println("进度:" + (i / count * 100) + "%");
             }
         }catch (Exception e){
             e.printStackTrace();
