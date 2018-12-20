@@ -16,7 +16,11 @@ public class IOUtils {
 
     public static void downloadImage(String href,String dir){
         try {
-            FileUtils.copyURLToFile(new URL(href),FileUtils.getFile(dir));
+            if(!FileUtils.getFile(dir).exists())
+            {
+                FileUtils.copyURLToFile(new URL(href),FileUtils.getFile(dir));
+            }
+            System.out.println("保存成功:"+href+"->"+dir);
         } catch (IOException e) {
             e.printStackTrace();
         }

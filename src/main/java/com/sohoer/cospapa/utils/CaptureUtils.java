@@ -20,15 +20,15 @@ public class CaptureUtils {
 
     private static String baseURL = "http://www.gufengmh.com";
     private static String imgBaseURL = "http://res.gufengmh.com";
-    private static String comicPath = "C:/Users/watermelon/Documents/comic";
-    //private static String comicPath="/home/watermelon/comic";
+    //private static String comicPath = "C:/Users/watermelon/Documents/comic";
+    private static String comicPath = "/home/watermelon/comic";
     private static Float count = null;
 
-    private static String comisJson=comicPath+"/comics.json";
-    private static String captureProfileAndChaptersJson=comicPath+"/captureProfileAndChapters.json";
-    private static String contentJson=comicPath+"/content.json";
+    private static String comisJson = comicPath + "/comics.json";
+    private static String captureProfileAndChaptersJson = comicPath + "/captureProfileAndChapters.json";
+    private static String contentJson = comicPath + "/content.json";
 
-    private static Gson gson= new GsonBuilder().create();
+    private static Gson gson = new GsonBuilder().create();
 
     public static class Action {
         private static String SEARCH = "/search/";
@@ -39,15 +39,16 @@ public class CaptureUtils {
         //获取所有漫画
         String url = baseURL + Action.List;
         List<Map<String, Object>> list = null;
-        File comisJsonFile=new File(comisJson);
-        if(!comisJsonFile.exists())
-        {
-            list=getAllComics(url);
-            FileUtils.writeStringToFile(comisJsonFile,gson.toJson(list
-                    ,new TypeToken<List<Map<String, Object>>>(){}.getType()),"UTF-8");
-        }else{
-            list=gson.fromJson(FileUtils.readFileToString(comisJsonFile,"UTF-8")
-                    ,new TypeToken<List<Map<String, Object>>>(){}.getType());
+        File comisJsonFile = new File(comisJson);
+        if (!comisJsonFile.exists()) {
+            list = getAllComics(url);
+            FileUtils.writeStringToFile(comisJsonFile, gson.toJson(list
+                    , new TypeToken<List<Map<String, Object>>>() {
+                    }.getType()), "UTF-8");
+        } else {
+            list = gson.fromJson(FileUtils.readFileToString(comisJsonFile, "UTF-8")
+                    , new TypeToken<List<Map<String, Object>>>() {
+                    }.getType());
         }
 
         count = Float.parseFloat(String.valueOf(list.size()));
@@ -56,10 +57,8 @@ public class CaptureUtils {
         System.out.println("漫画总数:" + list.size());
         System.out.println("开始获取漫画章节和简介");
 
-
-        File captureProfileAndChaptersJsonFile=new File(captureProfileAndChaptersJson);
-        if(!captureProfileAndChaptersJsonFile.exists())
-        {
+        File captureProfileAndChaptersJsonFile = new File(captureProfileAndChaptersJson);
+        if (!captureProfileAndChaptersJsonFile.exists()) {
             for (int i = 0; i < list.size(); i++) {
                 Map<String, Object> map = list.get(i);
                 map = captureProfileAndChapters(map);
@@ -70,20 +69,21 @@ public class CaptureUtils {
                     count = Float.parseFloat(String.valueOf(list.size()));
                 }
             }
-            FileUtils.writeStringToFile(captureProfileAndChaptersJsonFile,gson.toJson(list
-                    ,new TypeToken<List<Map<String, Object>>>(){}.getType()),"UTF-8");
-        }else{
-            list=gson.fromJson(FileUtils.readFileToString(captureProfileAndChaptersJsonFile,"UTF-8")
-                    ,new TypeToken<List<Map<String, Object>>>(){}.getType());
+            FileUtils.writeStringToFile(captureProfileAndChaptersJsonFile, gson.toJson(list
+                    , new TypeToken<List<Map<String, Object>>>() {
+                    }.getType()), "UTF-8");
+        } else {
+            list = gson.fromJson(FileUtils.readFileToString(captureProfileAndChaptersJsonFile, "UTF-8")
+                    , new TypeToken<List<Map<String, Object>>>() {
+                    }.getType());
         }
 
         System.out.println("获取漫画章节和简介成功");
         System.out.println("开始获取漫画内容地址");
         //异步获取漫画内容
 
-        File contentJsonFile=new File(contentJson);
-        if(!contentJsonFile.exists())
-        {
+        File contentJsonFile = new File(contentJson);
+        if (!contentJsonFile.exists()) {
             for (int i = 0; i < list.size(); i++) {
                 Map<String, Object> map = list.get(i);
                 //获取漫画内容
@@ -97,148 +97,153 @@ public class CaptureUtils {
                 }
                 System.out.println("进度:" + (i / count * 100) + "%");
             }
-            FileUtils.writeStringToFile(contentJsonFile,gson.toJson(list
-                    ,new TypeToken<List<Map<String, Object>>>(){}.getType()),"UTF-8");
-        }else{
-            list=gson.fromJson(FileUtils.readFileToString(contentJsonFile,"UTF-8")
-                    ,new TypeToken<List<Map<String, Object>>>(){}.getType());
+            FileUtils.writeStringToFile(contentJsonFile, gson.toJson(list
+                    , new TypeToken<List<Map<String, Object>>>() {
+                    }.getType()), "UTF-8");
+        } else {
+            list = gson.fromJson(FileUtils.readFileToString(contentJsonFile, "UTF-8")
+                    , new TypeToken<List<Map<String, Object>>>() {
+                    }.getType());
         }
         System.out.println("获取漫画内容地址成功");
         System.out.println("开始获取漫画内容");
         //下载
-        try {
-            for (int i = 0; i < list.size(); i++) {
-                Map<String, Object> map = list.get(i);
-                List<Map<String, Object>> chapterList = (List<Map<String, Object>>) map.get("chapter");
-                String bookName = (String) map.get("cn");
-                for (int j = 0; j < chapterList.size(); j++) {
-                    Map<String, Object> chapter = chapterList.get(j);
-                    List<String> pathList = (List<String>) chapter.get("path");
-                    String chapterName = (String) chapter.get("title");
-                    for (int k = 0; k < pathList.size(); k++) {
-                        String path = pathList.get(k);
-                        String filePath = comicPath + "/" + bookName + "/" + chapterName + "/" + (k + 1) + ".jpg";
-                        System.out.println(filePath);
-                        IOUtils.downloadImage(path, filePath);
-                    }
-                }
-                System.out.println("进度:" + (i / count * 100) + "%");
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        System.out.println("获取漫画内容成功");
 
-        //System.out.println(list.get(0));
-        //获取所有漫画类型
-
-        //将漫画归类
-
-    }
-
-    /**
-     * 根据章节list获取内容地址
-     *
-     * @param list
-     * @return
-     */
-    public static List<Map<String, Object>> getContent(List<Map<String, Object>> list) {
-        list.stream().forEach(chapter -> {
-
-            //漫画详情页面地址
-            String href = (String) chapter.get("href");
-            if (href != null) {
-                Document doc = null;
+            for (int i = list.size()/2; i < list.size(); i++) {
                 try {
-                    doc = Jsoup.connect(href).get();
-                    Elements elements = doc.getElementsByTag("script");
-                    String scriptString = elements.get(2).toString();
-                    String chapterPath = RegexUtils.getChapterPath(scriptString);
-                    List<String> contentImages = RegexUtils.getImage(scriptString);
-                    for (int i = 0; i < contentImages.size(); i++) {
-                        contentImages.set(i, imgBaseURL + "/" + chapterPath + contentImages.get(i));
+                    Map<String, Object> map = list.get(i);
+                    List<Map<String, Object>> chapterList = (List<Map<String, Object>>) map.get("chapter");
+                    String bookName = (String) map.get("cn");
+                    for (int j = 0; j < chapterList.size(); j++) {
+                        Map<String, Object> chapter = chapterList.get(j);
+                        List<String> pathList = (List<String>) chapter.get("path");
+                        String chapterName = (String) chapter.get("title");
+                        for (int k = 0; k < pathList.size(); k++) {
+                            String path = pathList.get(k);
+                            String filePath = comicPath + "/" + bookName + "/" + chapterName + "/" + (k + 1) + ".jpg";
+                            System.out.println(filePath);
+                            IOUtils.downloadImage(path, filePath);
+                        }
                     }
-
-                    chapter.put("path", contentImages);
-
-                } catch (IOException e) {
-                    System.out.println("出问题的map:");
-                    System.out.println(list);
+                    System.out.println("进度:" + (i / count * 100) + "%");
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-        });
-        return list;
-    }
 
-    /**
-     * 根据书名找简介
-     *
-     * @param map
-     * @return
-     */
-    public static Map<String, Object> captureProfileAndChapters(Map<String, Object> map) {
-        Document doc = null;
+            System.out.println("获取漫画内容成功");
 
-        try {
+            //System.out.println(list.get(0));
+            //获取所有漫画类型
 
-            doc = Jsoup.connect((String) map.get("href")).get();
-            Element div = doc.getElementById("intro-all");
-            Element p = div.getElementsByTag("p").first();
-            String content = p.text();
-            String[] contents = content.split("：");
-            map.put("profile", contents[1]);
-            Element ul = doc.getElementById("chapter-list-1");
-            if (ul == null) {
-                return null;
-            }
-            Elements lis = ul.getElementsByTag("li");
-            List<Map<String, Object>> list = new ArrayList<>();
-            lis.stream().forEach(li -> {
-                Map<String, Object> chapter = new HashMap<>();
+            //将漫画归类
 
-                //章节路径
-                Element a = li.getElementsByTag("a").first();
-                if (RegexUtils.validateChapterDetailPath(a.attr("href"))) {
-                    chapter.put("href", CaptureUtils.baseURL + a.attr("href"));
-                }
-                String chapterTitle = li.getElementsByTag("span").first().text();
-                chapter.put("title", chapterTitle);
-                list.add(chapter);
-            });
-            map.put("chapter", list);
-            return map;
-        } catch (IOException ex) {
-            ex.printStackTrace();
         }
 
-        return null;
-    }
+        /**
+         * 根据章节list获取内容地址
+         *
+         * @param list
+         * @return
+         */
+        public static List<Map<String, Object>> getContent (List < Map < String, Object >> list){
+            list.stream().forEach(chapter -> {
 
-    /**
-     * 获取所有漫画
-     *
-     * @param url
-     * @return
-     */
-    public static List<Map<String, Object>> getAllComics(String url) {
-        Elements bookList = getAnAlphabeticalListOfComicsByURL(url);
-        List<Map<String, Object>> list = new ArrayList<>();
-        bookList.stream().forEach(bookEle -> {
-            List<Map<String, Object>> bookEleList = getAllComicsByLetter(bookEle);
-            bookEleList.stream().forEach(book -> {
-                list.add(book);
+                //漫画详情页面地址
+                String href = (String) chapter.get("href");
+                if (href != null) {
+                    Document doc = null;
+                    try {
+                        doc = Jsoup.connect(href).get();
+                        Elements elements = doc.getElementsByTag("script");
+                        String scriptString = elements.get(2).toString();
+                        String chapterPath = RegexUtils.getChapterPath(scriptString);
+                        List<String> contentImages = RegexUtils.getImage(scriptString);
+                        for (int i = 0; i < contentImages.size(); i++) {
+                            contentImages.set(i, imgBaseURL + "/" + chapterPath + contentImages.get(i));
+                        }
+
+                        chapter.put("path", contentImages);
+
+                    } catch (IOException e) {
+                        System.out.println("出问题的map:");
+                        System.out.println(list);
+                        e.printStackTrace();
+                    }
+                }
             });
-        });
-        return list;
-    }
+            return list;
+        }
 
-    /**
-     * 获取所有漫画列表,得到的结果是按字母排序的漫画列表
-     *
-     * @param url
-     * @return
-     */
+        /**
+         * 根据书名找简介
+         *
+         * @param map
+         * @return
+         */
+        public static Map<String, Object> captureProfileAndChapters (Map < String, Object > map){
+            Document doc = null;
+
+            try {
+
+                doc = Jsoup.connect((String) map.get("href")).get();
+                Element div = doc.getElementById("intro-all");
+                Element p = div.getElementsByTag("p").first();
+                String content = p.text();
+                String[] contents = content.split("：");
+                map.put("profile", contents[1]);
+                Element ul = doc.getElementById("chapter-list-1");
+                if (ul == null) {
+                    return null;
+                }
+                Elements lis = ul.getElementsByTag("li");
+                List<Map<String, Object>> list = new ArrayList<>();
+                lis.stream().forEach(li -> {
+                    Map<String, Object> chapter = new HashMap<>();
+
+                    //章节路径
+                    Element a = li.getElementsByTag("a").first();
+                    if (RegexUtils.validateChapterDetailPath(a.attr("href"))) {
+                        chapter.put("href", CaptureUtils.baseURL + a.attr("href"));
+                    }
+                    String chapterTitle = li.getElementsByTag("span").first().text();
+                    chapter.put("title", chapterTitle);
+                    list.add(chapter);
+                });
+                map.put("chapter", list);
+                return map;
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+            return null;
+        }
+
+        /**
+         * 获取所有漫画
+         *
+         * @param url
+         * @return
+         */
+        public static List<Map<String, Object>> getAllComics (String url){
+            Elements bookList = getAnAlphabeticalListOfComicsByURL(url);
+            List<Map<String, Object>> list = new ArrayList<>();
+            bookList.stream().forEach(bookEle -> {
+                List<Map<String, Object>> bookEleList = getAllComicsByLetter(bookEle);
+                bookEleList.stream().forEach(book -> {
+                    list.add(book);
+                });
+            });
+            return list;
+        }
+
+        /**
+         * 获取所有漫画列表,得到的结果是按字母排序的漫画列表
+         *
+         * @param url
+         * @return
+         */
+
     public static Elements getAnAlphabeticalListOfComicsByURL(String url) {
         Document doc = null;
         Elements bookList = null;
