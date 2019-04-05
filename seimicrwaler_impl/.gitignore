@@ -1,5 +1,5 @@
-/impl01/target/
-/seimicrwaler_impl/target/
+HELP.md
+/target/
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
@@ -19,8 +19,11 @@
 
 ### NetBeans ###
 /nbproject/private/
-/build/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
+/build/
+
+### VS Code ###
+.vscode/
