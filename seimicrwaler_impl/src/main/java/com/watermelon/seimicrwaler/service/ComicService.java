@@ -1,15 +1,20 @@
 package com.watermelon.seimicrwaler.service;
 
+import com.alibaba.druid.support.json.JSONUtils;
 import com.watermelon.seimicrwaler.dao.ChapterDao;
 import com.watermelon.seimicrwaler.dao.ComicDao;
 import com.watermelon.seimicrwaler.dao.LessonDao;
 import com.watermelon.seimicrwaler.entity.Chapter;
 import com.watermelon.seimicrwaler.entity.Comic;
 import com.watermelon.seimicrwaler.entity.Lesson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.converter.json.GsonBuilderUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +27,7 @@ import java.util.Optional;
  */
 @Service
 public class ComicService {
+    protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private ComicDao comicDao;
@@ -44,7 +50,6 @@ public class ComicService {
         comic.setDeleted(false);
         return comicDao.save(comic);
     }
-
 
     public void saveIfNotExist(Comic comic) {
         Comic old = this.findOne(comic);
@@ -74,7 +79,8 @@ public class ComicService {
         return comicDao.findAll(Example.of(comic), PageRequest.of(page, size));
     }
 
-
+    @Transactional
+    @Async
     public void saveChapter(Chapter chapter, List<Lesson> lessonList) {
         Chapter m = chapterDao.findOne(Example.of(chapter)).orElse(null);
         Date now = new Date();
@@ -85,11 +91,13 @@ public class ComicService {
         chapter.setCreateTime(now);
         chapter.setUpdateTime(now);
         chapter.setDeleted(false);
+        logger.info("{},开始保存chapter数据,chapter:{}", Thread.currentThread().getName(), JSONUtils.toJSONString(chapter));
         Chapter model = chapterDao.save(chapter);
+        logger.info("{},数据保存成功,返回chapter:{}", Thread.currentThread().getName(), JSONUtils.toJSONString(model));
         if (lessonList != null) {
             for (Lesson lesson : lessonList) {
                 List<Lesson> n = lessonDao.findAll(Example.of(lesson));
-                if (n.size()>0) {
+                if (n.size() > 0) {
                     continue;
                 }
                 lesson.setChapterId(model.getId());
@@ -100,8 +108,8 @@ public class ComicService {
             }
 
         }
+        logger.info("{},开始保存lesson数据,lessons:{}", Thread.currentThread().getName(), JSONUtils.toJSONString(lessonList));
         lessonDao.saveAll(lessonList);
     }
-
 
 }
