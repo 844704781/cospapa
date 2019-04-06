@@ -19,8 +19,14 @@ public class TypeInfo {
 
     private Integer typeId;
 
+    /**
+     * 最后一页的页码
+     */
     private Integer lastIndex;
 
+    /**
+     * 最后一页的的书本量
+     */
     private Integer lastNumber;
 
     @Column(name = "createTime")

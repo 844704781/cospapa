@@ -8,6 +8,7 @@ import com.watermelon.seimicrwaler.entity.Chapter;
 import com.watermelon.seimicrwaler.entity.Comic;
 import com.watermelon.seimicrwaler.entity.Lesson;
 import com.watermelon.seimicrwaler.entity.Type;
+import com.watermelon.seimicrwaler.service.ChapterService;
 import com.watermelon.seimicrwaler.service.ComicService;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -27,6 +28,9 @@ public class ProfileCrawler extends BaseSeimiCrawler {
     @Autowired
     private ComicService comicService;
 
+    @Autowired
+    private ChapterService chapterService;
+
     @Value("${gufeng.base.url}")
     private String baseUrl;
 
@@ -44,20 +48,41 @@ public class ProfileCrawler extends BaseSeimiCrawler {
     public List<Request> startRequests() {
         List<Request> requests = new LinkedList<>();
 
-        count = comicService.count(null);
+//        count = comicService.count(null);
+//
+//        for (int i = 0; i < count; i++) {
+//            List<Comic> comicList = comicService.page(null, i, 1).getContent();
+//            Comic comic = comicList.get(0);
+//            String url = comic.getUrl();
+//            logger.info("name:{},url:{}", comic.getName(), url);
+//            Request request = Request.build(url, "start");
+//            Map<String, Object> map = new HashMap<>();
+//            map.put("comicId", comic.getId());
+//            map.put("url", comic.getUrl());
+//            request.setMeta(map);
+//            requests.add(request);
+//        }
 
-        for (int i = 0; i < count; i++) {
-            List<Comic> comicList = comicService.page(null, i, 1).getContent();
-            Comic comic = comicList.get(0);
-            String url = comic.getUrl();
-            logger.info("name:{},url:{}", comic.getName(), url);
-            Request request = Request.build(url, "start");
+        logger.info("comic表开始时间:{}", new Date());
+
+        List<Comic> comicList = comicService.findAll(null);
+        logger.info("comic表结束时间:{}", new Date());
+        logger.info("chapter表开始时间:{}", new Date());
+        for (Comic comic : comicList) {
+            Request request = Request.build(comic.getUrl(), "start");
             Map<String, Object> map = new HashMap<>();
             map.put("comicId", comic.getId());
             map.put("url", comic.getUrl());
             request.setMeta(map);
-            requests.add(request);
+
+            Chapter tmp = new Chapter();
+            tmp.setComicId(comic.getId());
+            tmp = chapterService.findOne(tmp);
+            if (tmp != null) {
+                requests.add(request);
+            }
         }
+        logger.info("chapter表结束时间:{}", new Date());
         return requests;
     }
 

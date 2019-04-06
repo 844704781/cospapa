@@ -33,4 +33,17 @@ public class Comic {
     private Date updateTime;
     @Column(name = "isDeleted")
     private boolean isDeleted;
+
+    public Comic(Integer id) {
+        this.id = id;
+    }
+
+    public Comic(String name, String url) {
+        this.name = name;
+        this.url = url;
+    }
+
+    public Comic(){
+
+    }
 }

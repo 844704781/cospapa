@@ -45,6 +45,7 @@ public class ComicService {
         return comicDao.save(comic);
     }
 
+
     public void saveIfNotExist(Comic comic) {
         Comic old = this.findOne(comic);
         if (old == null) {
@@ -73,12 +74,13 @@ public class ComicService {
         return comicDao.findAll(Example.of(comic), PageRequest.of(page, size));
     }
 
-    @Transactional
+
     public void saveChapter(Chapter chapter, List<Lesson> lessonList) {
         Chapter m = chapterDao.findOne(Example.of(chapter)).orElse(null);
         Date now = new Date();
         if (m != null) {
             chapter.setId(m.getId());
+            return;
         }
         chapter.setCreateTime(now);
         chapter.setUpdateTime(now);
@@ -100,4 +102,6 @@ public class ComicService {
         }
         lessonDao.saveAll(lessonList);
     }
+
+
 }

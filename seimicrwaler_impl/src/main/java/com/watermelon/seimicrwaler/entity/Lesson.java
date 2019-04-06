@@ -27,6 +27,13 @@ public class Lesson {
 
     private String path;
 
+    private String position;
+
+    /**
+     * 每一节的页数
+     */
+    private Integer page;
+
     @Column(name = "createTime")
     private Date createTime;
 
@@ -35,4 +42,12 @@ public class Lesson {
 
     @Column(name = "isDeleted")
     private boolean isDeleted;
+
+    public Lesson(Integer id) {
+        this.id = id;
+    }
+
+    public Lesson(){
+
+    }
 }
