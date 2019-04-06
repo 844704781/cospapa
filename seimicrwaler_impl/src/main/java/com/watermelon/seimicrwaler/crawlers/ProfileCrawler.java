@@ -48,21 +48,6 @@ public class ProfileCrawler extends BaseSeimiCrawler {
     public List<Request> startRequests() {
         List<Request> requests = new LinkedList<>();
 
-//        count = comicService.count(null);
-//
-//        for (int i = 0; i < count; i++) {
-//            List<Comic> comicList = comicService.page(null, i, 1).getContent();
-//            Comic comic = comicList.get(0);
-//            String url = comic.getUrl();
-//            logger.info("name:{},url:{}", comic.getName(), url);
-//            Request request = Request.build(url, "start");
-//            Map<String, Object> map = new HashMap<>();
-//            map.put("comicId", comic.getId());
-//            map.put("url", comic.getUrl());
-//            request.setMeta(map);
-//            requests.add(request);
-//        }
-
         logger.info("comic表开始时间:{}", new Date());
 
         List<Comic> comicList = comicService.findAll(null);
@@ -83,9 +68,11 @@ public class ProfileCrawler extends BaseSeimiCrawler {
             if (tmp == null) {
                 requests.add(request);
             }
+
         }
         logger.info("chapter表结束时间:{},chapter的数量:{}", new Date(), requests.size());
         return requests;
+
     }
 
     @Override

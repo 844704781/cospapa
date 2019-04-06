@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Created by watermelon on 2019/04/05
  */
 @RestController
-@RequestMapping("/crwaler")
+@RequestMapping("/crawler")
 @ResponseBody
 public class CrawlerController {
 
