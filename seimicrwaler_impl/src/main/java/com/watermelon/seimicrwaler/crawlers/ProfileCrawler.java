@@ -79,10 +79,10 @@ public class ProfileCrawler extends BaseSeimiCrawler {
             Chapter tmp = new Chapter();
             tmp.setComicId(comic.getId());
             tmp = chapterService.findOne(tmp);
+            logger.info("查询chapter进度:{}", (double) i / count * 100 + "%");
             if (tmp == null) {
                 requests.add(request);
             }
-            logger.info("查询chapter进度:{}", (double) i / count * 100 + "%");
         }
         logger.info("chapter表结束时间:{}", new Date());
         return requests;
