@@ -19,6 +19,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -80,7 +81,7 @@ public class ComicService {
         return comicDao.findAll(Example.of(comic), PageRequest.of(page, size));
     }
 
-    @Transactional
+    @Async
     public void saveChapter(Chapter chapter, List<Lesson> lessonList) {
         Chapter m = chapterDao.findOne(Example.of(chapter)).orElse(null);
         Date now = new Date();
@@ -94,6 +95,7 @@ public class ComicService {
         logger.info("{},开始保存chapter数据,chapter:{}", Thread.currentThread().getName(), JsonUtils.toJson(chapter, Chapter.class));
         Chapter model = chapterDao.save(chapter);
         logger.info("{},数据保存成功,返回chapter:{}", Thread.currentThread().getName(), JsonUtils.toJson(model, Chapter.class));
+        List<Lesson> lessons = new ArrayList<>();
         if (lessonList != null) {
             for (Lesson lesson : lessonList) {
                 List<Lesson> n = lessonDao.findAll(Example.of(lesson));
@@ -105,12 +107,13 @@ public class ComicService {
                 lesson.setCreateTime(now);
                 lesson.setUpdateTime(now);
                 lesson.setDeleted(false);
+                lessons.add(lesson);
             }
 
         }
         logger.info("{},开始保存lesson数据,lessons:{}", Thread.currentThread().getName(), JsonUtils.toJson(lessonList, List.class));
-        lessonDao.saveAll(lessonList);
-        logger.info("{},lesson保存成功",Thread.currentThread().getName());
+        lessonDao.saveAll(lessons);
+        logger.info("{},lesson保存成功", Thread.currentThread().getName());
     }
 
 }

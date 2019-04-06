@@ -81,11 +81,12 @@ public class ProfileCrawler extends BaseSeimiCrawler {
             logger.info("查询chapter进度:{}", (double) i / comicList.size() * 100 + "%");
             if (chapters.size() == 0 || lessons.size() == 0) {
                 requests.add(request);
+                logger.info("comic的数量:{}", requests.size());
             }
 
         }
         count = requests.size();
-        logger.info("chapter表结束时间:{},chapter的数量:{}", new Date(), requests.size());
+        logger.info("chapter表结束时间:{},comic的数量:{}", new Date(), requests.size());
         return requests;
 
     }
