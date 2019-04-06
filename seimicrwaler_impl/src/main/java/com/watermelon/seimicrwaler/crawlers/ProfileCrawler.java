@@ -84,7 +84,7 @@ public class ProfileCrawler extends BaseSeimiCrawler {
                 requests.add(request);
             }
         }
-        logger.info("chapter表结束时间:{}", new Date());
+        logger.info("chapter表结束时间:{},chapter的数量:{}", new Date(), requests.size());
         return requests;
     }
 
