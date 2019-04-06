@@ -10,6 +10,7 @@ import com.watermelon.seimicrwaler.entity.Lesson;
 import com.watermelon.seimicrwaler.entity.Type;
 import com.watermelon.seimicrwaler.service.ChapterService;
 import com.watermelon.seimicrwaler.service.ComicService;
+import com.watermelon.seimicrwaler.service.LessonService;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.seimicrawler.xpath.JXDocument;
@@ -31,6 +32,8 @@ public class ProfileCrawler extends BaseSeimiCrawler {
     @Autowired
     private ChapterService chapterService;
 
+    @Autowired
+    private LessonService lessonService;
     @Value("${gufeng.base.url}")
     private String baseUrl;
 
@@ -65,8 +68,17 @@ public class ProfileCrawler extends BaseSeimiCrawler {
             Chapter tmp = new Chapter();
             tmp.setComicId(comic.getId());
             tmp = chapterService.findOne(tmp);
+            Lesson lesson = null;
+            List<Lesson> lessons = null;
+            if (tmp != null) {
+                lesson = new Lesson();
+                lesson.setChapterId(tmp.getId());
+                lesson.setComicId(comic.getId());
+                lessons = lessonService.findAll(lesson);
+
+            }
             logger.info("查询chapter进度:{}", (double) i / comicList.size() * 100 + "%");
-            if (tmp == null) {
+            if (tmp == null || lessons.size() == 0) {
                 requests.add(request);
             }
 

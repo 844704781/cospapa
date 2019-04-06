@@ -81,7 +81,6 @@ public class ComicService {
     }
 
     @Transactional
-    @Async
     public void saveChapter(Chapter chapter, List<Lesson> lessonList) {
         Chapter m = chapterDao.findOne(Example.of(chapter)).orElse(null);
         Date now = new Date();
@@ -111,6 +110,7 @@ public class ComicService {
         }
         logger.info("{},开始保存lesson数据,lessons:{}", Thread.currentThread().getName(), JsonUtils.toJson(lessonList, List.class));
         lessonDao.saveAll(lessonList);
+        logger.info("{},lesson保存成功",Thread.currentThread().getName());
     }
 
 }
