@@ -66,19 +66,20 @@ public class ProfileCrawler extends BaseSeimiCrawler {
             request.setMeta(map);
 
             Chapter tmp = new Chapter();
+            List<Chapter> chapters = null;
             tmp.setComicId(comic.getId());
-            tmp = chapterService.findOne(tmp);
+            chapters = chapterService.page(tmp, 1, 1).getContent();
             Lesson lesson = null;
             List<Lesson> lessons = null;
             if (tmp != null) {
                 lesson = new Lesson();
                 lesson.setChapterId(tmp.getId());
                 lesson.setComicId(comic.getId());
-                lessons = lessonService.findAll(lesson);
+                lessons = lessonService.page(lesson, 1, 1).getContent();
 
             }
             logger.info("查询chapter进度:{}", (double) i / comicList.size() * 100 + "%");
-            if (tmp == null || lessons.size() == 0) {
+            if (chapters.size() == 0 || lessons.size() == 0) {
                 requests.add(request);
             }
 
