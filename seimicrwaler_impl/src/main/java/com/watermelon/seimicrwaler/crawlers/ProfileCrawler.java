@@ -53,6 +53,7 @@ public class ProfileCrawler extends BaseSeimiCrawler {
         List<Comic> comicList = comicService.findAll(null);
         logger.info("comic表结束时间:{}", new Date());
         logger.info("chapter表开始时间:{}", new Date());
+
         for (int i = 0; i < comicList.size(); i++) {
             Comic comic = comicList.get(i);
             Request request = Request.build(comic.getUrl(), "start");
@@ -70,6 +71,7 @@ public class ProfileCrawler extends BaseSeimiCrawler {
             }
 
         }
+        count = requests.size();
         logger.info("chapter表结束时间:{},chapter的数量:{}", new Date(), requests.size());
         return requests;
 
