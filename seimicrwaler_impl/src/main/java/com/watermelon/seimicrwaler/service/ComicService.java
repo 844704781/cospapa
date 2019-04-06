@@ -7,6 +7,7 @@ import com.watermelon.seimicrwaler.dao.LessonDao;
 import com.watermelon.seimicrwaler.entity.Chapter;
 import com.watermelon.seimicrwaler.entity.Comic;
 import com.watermelon.seimicrwaler.entity.Lesson;
+import com.watermelon.seimicrwaler.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,9 +92,9 @@ public class ComicService {
         chapter.setCreateTime(now);
         chapter.setUpdateTime(now);
         chapter.setDeleted(false);
-        logger.info("{},开始保存chapter数据,chapter:{}", Thread.currentThread().getName(), JSONUtils.toJSONString(chapter));
+        logger.info("{},开始保存chapter数据,chapter:{}", Thread.currentThread().getName(), JsonUtils.toJson(chapter, Chapter.class));
         Chapter model = chapterDao.save(chapter);
-        logger.info("{},数据保存成功,返回chapter:{}", Thread.currentThread().getName(), JSONUtils.toJSONString(model));
+        logger.info("{},数据保存成功,返回chapter:{}", Thread.currentThread().getName(), JsonUtils.toJson(model, Chapter.class));
         if (lessonList != null) {
             for (Lesson lesson : lessonList) {
                 List<Lesson> n = lessonDao.findAll(Example.of(lesson));
@@ -108,7 +109,7 @@ public class ComicService {
             }
 
         }
-        logger.info("{},开始保存lesson数据,lessons:{}", Thread.currentThread().getName(), JSONUtils.toJSONString(lessonList));
+        logger.info("{},开始保存lesson数据,lessons:{}", Thread.currentThread().getName(), JsonUtils.toJson(lessonList, List.class));
         lessonDao.saveAll(lessonList);
     }
 
