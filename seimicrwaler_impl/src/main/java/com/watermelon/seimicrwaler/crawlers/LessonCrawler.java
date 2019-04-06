@@ -10,13 +10,19 @@ import com.watermelon.seimicrwaler.entity.Comic;
 import com.watermelon.seimicrwaler.entity.Lesson;
 import com.watermelon.seimicrwaler.service.ChapterService;
 import com.watermelon.seimicrwaler.service.ComicService;
+import com.watermelon.seimicrwaler.service.DownloadService;
 import com.watermelon.seimicrwaler.service.LessonService;
 import com.watermelon.seimicrwaler.utils.RegexUtils;
 
+import org.apache.commons.io.FileUtils;
 import org.seimicrawler.xpath.JXDocument;
+import org.seimicrawler.xpath.JXNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,11 +47,12 @@ public class LessonCrawler extends BaseSeimiCrawler {
     @Autowired
     private ComicService comicService;
 
+    @Autowired
+    private DownloadService downloadService;
+
     @Value("${gufeng.rs.base.url}")
     private String rsBaseUrl;
 
-    @Value("${comic.resource.path}")
-    private String comicResourcePath;
 
     @Override
     public String[] startUrls() {
@@ -56,12 +63,12 @@ public class LessonCrawler extends BaseSeimiCrawler {
     public List<Request> startRequests() {
         List<Request> requests = new LinkedList<>();
 
-        count = lessonService.count(null);
+        //List<Lesson> lessons=lessonService.findAll(null);
+        List<Lesson> lessons = lessonService.page(null,1,1).getContent();
+        count = lessons.size();
+        for (int i = 0; i < lessons.size(); i++) {
 
-        for (int i = 0; i < count; i++) {
-            List<Lesson> lessonList = lessonService.page(null, i, 1).getContent();
-
-            Lesson lesson = lessonList.get(0);
+            Lesson lesson = lessons.get(i);
             String url = lesson.getPath();
             logger.info("进度:{},name:{},url:{}", (double) i / count * 100 + "%", lesson.getName(), url);
             Request request = Request.build(url, "start");
@@ -76,7 +83,7 @@ public class LessonCrawler extends BaseSeimiCrawler {
 
     @Override
     public void start(Response response) {
-        String scriptXpath = "//script";
+        String scriptXpath = "//body/script";
         String CHAPTERPATH="\"(images\\/comic\\/\\d+\\/\\d+\\/)\"";
         String IMAGE = "\"(.{1,40}\\.jpg)\"";
         JXDocument doc = response.document();
@@ -88,7 +95,7 @@ public class LessonCrawler extends BaseSeimiCrawler {
             Lesson lesson=lessonService.findOne(new Lesson((Integer) meta.get("lessonId")));
             Chapter chapter=chapterService.findOne(new Chapter(lesson.getChapterId()));
             Comic comic = comicService.findOne(new Comic(lesson.getComicId()));
-            Object script = doc.selOne(scriptXpath);
+            JXNode script = doc.selNOne(scriptXpath);
             String chapterPath = RegexUtils.filter(script.toString(), CHAPTERPATH, 1);
             List<String> images = RegexUtils.getArraysFilter(script.toString(), IMAGE, 1);
 
@@ -96,25 +103,21 @@ public class LessonCrawler extends BaseSeimiCrawler {
 
             for (int i = 0; i < images.size(); i++) {
                 String url =rsBaseUrl + "/" + chapterPath + images.get(i);
-                Request request = Request.build(url, LessonCrawler::downloadImage);
+                logger.info("url:{}",url);
                 Map<String,Object>map=new HashMap<>();
                 map.put("comicId",comic.getId());
                 map.put("chapterId",chapter.getId());
                 map.put("lessonId",lesson.getId());
-                request.setMeta(map);
-                push(request);
+                downloadService.downloadImage(map,url,i);
+                logger.info("保存成功");
             }
+            lessonService.save(lesson);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
-    private void downloadImage(Response response){
-
-        Map<String,Object>meta = response.getMeta();
-        String path=comicResourcePath+"/"+meta.get("comicId")+"/"+meta.get("chapterId")+"/"+meta.get("lessonId");
-        response.saveTo(new File(path));
-    }
 
 
 

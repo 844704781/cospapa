@@ -44,7 +44,7 @@ public class DeDuplicateServcie {
             Comic current = comicService.findOne(new Comic(i));
             List<Comic> group = comicService.findAll(new Comic(current.getName(), current.getUrl()));
             for (int j = 0; j < group.size(); j++) {
-                if (j == 0) {
+                if (j == group.size()-1) {
                     continue;
                 }
                 Comic temp = group.get(i);

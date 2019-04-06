@@ -88,9 +88,9 @@ public class ComicService {
         Chapter model = chapterDao.save(chapter);
         if (lessonList != null) {
             for (Lesson lesson : lessonList) {
-                Lesson n = lessonDao.findOne(Example.of(lesson)).orElse(null);
-                if (n != null) {
-                    lesson.setId(n.getId());
+                List<Lesson> n = lessonDao.findAll(Example.of(lesson));
+                if (n.size()>0) {
+                    continue;
                 }
                 lesson.setChapterId(model.getId());
                 lesson.setComicId(model.getComicId());
