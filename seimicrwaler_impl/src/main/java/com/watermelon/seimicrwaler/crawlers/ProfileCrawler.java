@@ -133,6 +133,7 @@ public class ProfileCrawler extends BaseSeimiCrawler {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("漫画ID:{},URL:{},异常:{}", meta.get("comicId"), meta.get("url"), e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 }
