@@ -64,7 +64,7 @@ public class LessonCrawler extends BaseSeimiCrawler {
         List<Request> requests = new LinkedList<>();
 
         //List<Lesson> lessons=lessonService.findAll(null);
-        List<Lesson> lessons = lessonService.page(null,1,1).getContent();
+        List<Lesson> lessons = lessonService.page(null,0,1).getContent();
         count = lessons.size();
         for (int i = 0; i < lessons.size(); i++) {
 

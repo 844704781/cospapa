@@ -68,14 +68,14 @@ public class ProfileCrawler extends BaseSeimiCrawler {
             Chapter tmp = new Chapter();
             List<Chapter> chapters = null;
             tmp.setComicId(comic.getId());
-            chapters = chapterService.page(tmp, 1, 1).getContent();
+            chapters = chapterService.page(tmp, 0, 1).getContent();
             Lesson lesson = null;
             List<Lesson> lessons = null;
             if (tmp != null) {
                 lesson = new Lesson();
                 lesson.setChapterId(tmp.getId());
                 lesson.setComicId(comic.getId());
-                lessons = lessonService.page(lesson, 1, 1).getContent();
+                lessons = lessonService.page(lesson, 0, 1).getContent();
 
             }
             logger.info("查询chapter进度:{}", (double) i / comicList.size() * 100 + "%");
