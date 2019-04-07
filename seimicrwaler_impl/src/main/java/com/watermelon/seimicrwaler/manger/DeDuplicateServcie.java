@@ -74,7 +74,7 @@ public class DeDuplicateServcie {
         count = chapterService.count(null);
         logger.info("根据chapter查找要删除的数据,开始,chapter总数量:{}", count);
         for (int i = 0; i < count; i++) {
-            Chapter chapter = chapterService.page(null, 0, 1).getContent().get(0);
+            Chapter chapter = chapterService.page(null, i, 1).getContent().get(0);
 
             /**
              * 查看这章漫画下有没有lesson,没有则删除
@@ -94,7 +94,7 @@ public class DeDuplicateServcie {
         count = comicService.count(null);
         logger.info("根据comic查找要删除的数据,开始,comic总数量:{}", count);
         for (int i = 0; i < count; i++) {
-            Comic comic = comicService.page(null, 0, 1).getContent().get(0);
+            Comic comic = comicService.page(null, i, 1).getContent().get(0);
             /**
              * 看看这漫画下有没有章节，没有的话则删除此漫画
              */
@@ -113,7 +113,7 @@ public class DeDuplicateServcie {
         count = comicTypeService.count(null);
         logger.info("根据comicType查找要整理的类型数据,comicType数量:{}", count);
         for (int i = 0; i < count; i++) {
-            ComicType comicType = comicTypeService.page(null, 0, 0).getContent().get(0);
+            ComicType comicType = comicTypeService.page(null, i, 0).getContent().get(0);
             Comic comic = new Comic();
             comic.setId(comicType.getComicId());
             comic.setDeleted(false);
