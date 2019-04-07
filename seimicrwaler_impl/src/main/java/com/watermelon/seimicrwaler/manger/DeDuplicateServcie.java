@@ -41,7 +41,7 @@ public class DeDuplicateServcie {
          * 以lesson重复去删对应的chapter与comic
          */
 //        for (int i = 0; i < count; i++) {
-//            Lesson lesson = lessonService.page(null, 0, 1).getContent().get(0);
+//            Lesson lesson = lessonService.page(null, i, 1).getContent().get(0);
 //            /**
 //             * 查找同名的漫画
 //             */
