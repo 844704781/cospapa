@@ -82,7 +82,6 @@ public class ComicService {
     }
 
 
-    @Async
     public void saveChapter(Chapter chapter, List<Lesson> lessonList) {
         Chapter m = chapterDao.findOne(Example.of(chapter)).orElse(null);
         Date now = new Date();
