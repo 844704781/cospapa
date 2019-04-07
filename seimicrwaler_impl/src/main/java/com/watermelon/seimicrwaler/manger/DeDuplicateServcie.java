@@ -84,11 +84,9 @@ public class DeDuplicateServcie {
             lesson.setDeleted(false);
             List<Lesson> lessonList = lessonService.findAll(lesson);
             if (lessonList.size() == 0) {
-                Chapter chapterTemp = new Chapter();
-                chapterTemp.setDeleted(true);
-                chapterTemp.setId(chapter.getId());
-                chapterService.save(chapterTemp);
-                logger.info("查找到无效chapter,chapter:{}", JsonUtils.toJson(chapterTemp, Chapter.class));
+                chapter.setDeleted(true);
+                chapterService.save(chapter);
+                logger.info("查找到无效chapter,chapter:{}", JsonUtils.toJson(chapter, Chapter.class));
             }
             logger.info("根据chapter查找要删除的数据,进度:{}", (float) i / count * 100 + "%");
         }
@@ -105,11 +103,9 @@ public class DeDuplicateServcie {
             chapter.setDeleted(false);
             List<Chapter> chapters = chapterService.findAll(chapter);
             if (chapters.size() == 0) {
-                Comic comicTemp = new Comic();
-                comicTemp.setDeleted(true);
-                comicTemp.setId(comic.getId());
-                comicService.save(comicTemp);
-                logger.info("查找到无效comic,comicr:{}", JsonUtils.toJson(comicTemp, Comic.class));
+                comic.setDeleted(true);
+                comicService.save(comic);
+                logger.info("查找到无效comic,comicr:{}", JsonUtils.toJson(comic, Comic.class));
             }
             logger.info("根据comic查找要删除的数据,进度:{}", (float) i / count * 100 + "%");
         }
