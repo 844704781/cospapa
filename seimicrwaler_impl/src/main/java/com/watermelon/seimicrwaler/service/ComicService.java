@@ -81,13 +81,12 @@ public class ComicService {
         return comicDao.findAll(Example.of(comic), PageRequest.of(page, size));
     }
 
-    @Async
+    
     public void saveChapter(Chapter chapter, List<Lesson> lessonList) {
         Chapter m = chapterDao.findOne(Example.of(chapter)).orElse(null);
         Date now = new Date();
         if (m != null) {
             chapter.setId(m.getId());
-            return;
         }
         chapter.setCreateTime(now);
         chapter.setUpdateTime(now);
