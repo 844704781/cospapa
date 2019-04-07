@@ -40,36 +40,36 @@ public class DeDuplicateServcie {
         /**
          * 以lesson重复去删对应的chapter与comic
          */
-        for (int i = 0; i < count; i++) {
-            Lesson lesson = lessonService.page(null, 0, 1).getContent().get(0);
-            /**
-             * 查找同名的漫画
-             */
-            Lesson lessonTmp = new Lesson();
-            lessonTmp.setName(lesson.getName());
-            lessonTmp.setPath(lesson.getPath());
-            List<Lesson> lessons = lessonService.findAll(lessonTmp);
-            for (Lesson les : lessons) {
-                if (les.getId() != lesson.getId()) {
-                    Lesson lessonTemp = new Lesson();
-                    lessonTemp.setId(les.getId());
-                    lessonTemp.setDeleted(true);
-                    lessonService.save(lessonTemp);
-
-                    Chapter chapter = new Chapter();
-                    chapter.setId(les.getChapterId());
-                    chapter.setDeleted(true);
-                    chapterService.save(chapter);
-
-                    Comic comic = new Comic();
-                    comic.setId(les.getComicId());
-                    comic.setDeleted(true);
-                    comicService.save(comic);
-                    logger.info("查找到重复lesson,lesson:{}", JsonUtils.toJson(les, Lesson.class));
-                }
-            }
-            logger.info("根据lesson查找要删除的数据,进度:{}", (float) i / count * 100 + "%");
-        }
+//        for (int i = 0; i < count; i++) {
+//            Lesson lesson = lessonService.page(null, 0, 1).getContent().get(0);
+//            /**
+//             * 查找同名的漫画
+//             */
+//            Lesson lessonTmp = new Lesson();
+//            lessonTmp.setName(lesson.getName());
+//            lessonTmp.setPath(lesson.getPath());
+//            List<Lesson> lessons = lessonService.findAll(lessonTmp);
+//            for (Lesson les : lessons) {
+//                if (les.getId() != lesson.getId()) {
+//                    Lesson lessonTemp = new Lesson();
+//                    lessonTemp.setId(les.getId());
+//                    lessonTemp.setDeleted(true);
+//                    lessonService.save(lessonTemp);
+//
+//                    Chapter chapter = new Chapter();
+//                    chapter.setId(les.getChapterId());
+//                    chapter.setDeleted(true);
+//                    chapterService.save(chapter);
+//
+//                    Comic comic = new Comic();
+//                    comic.setId(les.getComicId());
+//                    comic.setDeleted(true);
+//                    comicService.save(comic);
+//                    logger.info("查找到重复lesson,lesson:{}", JsonUtils.toJson(les, Lesson.class));
+//                }
+//            }
+//            logger.info("根据lesson查找要删除的数据,进度:{}", (float) i / count * 100 + "%");
+//        }
 
         count = chapterService.count(null);
         logger.info("根据chapter查找要删除的数据,开始,chapter总数量:{}", count);
