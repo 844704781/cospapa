@@ -53,7 +53,9 @@ public class ProfileCrawler extends BaseSeimiCrawler {
 
         logger.info("comic表开始时间:{}", new Date());
 
-        List<Comic> comicList = comicService.findAll(null);
+        Comic c =new Comic();
+        c.setDeleted(false);
+        List<Comic> comicList = comicService.findAll(c);
         logger.info("comic表结束时间:{}", new Date());
         logger.info("chapter表开始时间:{}", new Date());
 
