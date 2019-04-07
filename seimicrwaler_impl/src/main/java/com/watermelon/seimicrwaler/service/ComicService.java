@@ -110,7 +110,7 @@ public class ComicService {
             }
 
         }
-        logger.info("{},开始保存lesson数据,lessons:{}", Thread.currentThread().getName(), JsonUtils.toJson(lessonList, List.class));
+        logger.info("{},开始保存lesson数据,lessons:{}", Thread.currentThread().getName(), JsonUtils.toJson(lessons, List.class));
         lessonDao.saveAll(lessons);
         logger.info("{},lesson保存成功", Thread.currentThread().getName());
     }
