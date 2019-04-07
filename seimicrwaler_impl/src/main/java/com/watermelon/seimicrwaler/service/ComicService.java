@@ -99,7 +99,8 @@ public class ComicService {
             for (Lesson lesson : lessonList) {
                 List<Lesson> n = lessonDao.findAll(Example.of(lesson));
                 if (n.size() > 0) {
-                    continue;
+		    logger.info("不保存lesson,因为数据已存在,为:{}",JsonUtils.toJson(n,List.class));
+                    break;
                 }
                 lesson.setChapterId(model.getId());
                 lesson.setComicId(model.getComicId());
