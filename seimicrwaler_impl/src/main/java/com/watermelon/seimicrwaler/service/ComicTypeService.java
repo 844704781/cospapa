@@ -54,4 +54,8 @@ public class ComicTypeService {
         }
         return comicTypeDao.findAll(Example.of(comicType), PageRequest.of(page, size));
     }
+
+    public List<ComicType> saveAll(List<ComicType> updateComicTypeList) {
+        return comicTypeDao.saveAll(updateComicTypeList);
+    }
 }

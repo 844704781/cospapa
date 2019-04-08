@@ -115,4 +115,7 @@ public class ComicService {
         logger.info("{},lesson保存成功", Thread.currentThread().getName());
     }
 
+    public List<Comic> saveAll(List<Comic> updateComicList) {
+        return comicDao.saveAll(updateComicList);
+    }
 }
