@@ -28,7 +28,6 @@ public class TypeService {
     public Type save(Type type) {
         type.setCreateTime(new Date());
         type.setUpdateTime(new Date());
-        type.setDeleted(false);
         return typeDao.save(type);
     }
 

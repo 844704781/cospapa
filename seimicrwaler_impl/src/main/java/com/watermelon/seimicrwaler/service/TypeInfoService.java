@@ -28,7 +28,6 @@ public class TypeInfoService {
     public TypeInfo save(TypeInfo typeInfo) {
         typeInfo.setCreateTime(new Date());
         typeInfo.setUpdateTime(new Date());
-        typeInfo.setDeleted(false);
         return typeInfoDao.save(typeInfo);
     }
 

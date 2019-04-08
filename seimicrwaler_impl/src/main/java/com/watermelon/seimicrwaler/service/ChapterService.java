@@ -32,7 +32,7 @@ public class ChapterService {
     public Chapter save(Chapter chapter) {
         chapter.setCreateTime(new Date());
         chapter.setUpdateTime(new Date());
-        chapter.setDeleted(false);
+
         return chapterDao.save(chapter);
     }
 

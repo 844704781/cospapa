@@ -31,7 +31,6 @@ public class ComicTypeService {
     public ComicType save(ComicType type) {
         type.setCreateTime(new Date());
         type.setUpdateTime(new Date());
-        type.setDeleted(false);
         return comicTypeDao.save(type);
     }
 

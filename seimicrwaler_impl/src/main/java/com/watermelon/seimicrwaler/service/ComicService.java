@@ -49,7 +49,6 @@ public class ComicService {
     public Comic save(Comic comic) {
         comic.setCreateTime(new Date());
         comic.setUpdateTime(new Date());
-        comic.setDeleted(false);
         return comicDao.save(comic);
     }
 
