@@ -4,7 +4,10 @@ import cn.wanghaomiao.seimi.annotation.Crawler;
 import cn.wanghaomiao.seimi.def.BaseSeimiCrawler;
 import cn.wanghaomiao.seimi.struct.Request;
 import cn.wanghaomiao.seimi.struct.Response;
+
 import java.io.File;
+
+import com.alibaba.druid.support.json.JSONUtils;
 import com.watermelon.seimicrwaler.entity.Chapter;
 import com.watermelon.seimicrwaler.entity.Comic;
 import com.watermelon.seimicrwaler.entity.Lesson;
@@ -12,6 +15,7 @@ import com.watermelon.seimicrwaler.service.ChapterService;
 import com.watermelon.seimicrwaler.service.ComicService;
 import com.watermelon.seimicrwaler.service.DownloadService;
 import com.watermelon.seimicrwaler.service.LessonService;
+import com.watermelon.seimicrwaler.utils.JsonUtils;
 import com.watermelon.seimicrwaler.utils.RegexUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -53,7 +57,6 @@ public class LessonCrawler extends BaseSeimiCrawler {
     @Value("${gufeng.rs.base.url}")
     private String rsBaseUrl;
 
-
     @Override
     public String[] startUrls() {
         return null;
@@ -63,8 +66,7 @@ public class LessonCrawler extends BaseSeimiCrawler {
     public List<Request> startRequests() {
         List<Request> requests = new LinkedList<>();
 
-        //List<Lesson> lessons=lessonService.findAll(null);
-        List<Lesson> lessons = lessonService.page(null,0,1).getContent();
+        List<Lesson> lessons = lessonService.findAll(new Lesson());
         count = lessons.size();
         for (int i = 0; i < lessons.size(); i++) {
 
@@ -84,16 +86,15 @@ public class LessonCrawler extends BaseSeimiCrawler {
     @Override
     public void start(Response response) {
         String scriptXpath = "//body/script";
-        String CHAPTERPATH="\"(images\\/comic\\/\\d+\\/\\d+\\/)\"";
+        String CHAPTERPATH = "\"(images\\/comic\\/\\d+\\/\\d+\\/)\"";
         String IMAGE = "\"(.{1,40}\\.jpg)\"";
         JXDocument doc = response.document();
-        Map<String,Object>meta=response.getMeta();
+        Map<String, Object> meta = response.getMeta();
 
         try {
 
-
-            Lesson lesson=lessonService.findOne(new Lesson((Integer) meta.get("lessonId")));
-            Chapter chapter=chapterService.findOne(new Chapter(lesson.getChapterId()));
+            Lesson lesson = lessonService.findOne(new Lesson((Integer) meta.get("lessonId")));
+            Chapter chapter = chapterService.findOne(new Chapter(lesson.getChapterId()));
             Comic comic = comicService.findOne(new Comic(lesson.getComicId()));
             JXNode script = doc.selNOne(scriptXpath);
             String chapterPath = RegexUtils.filter(script.toString(), CHAPTERPATH, 1);
@@ -102,23 +103,23 @@ public class LessonCrawler extends BaseSeimiCrawler {
             lesson.setPage(images.size());
 
             for (int i = 0; i < images.size(); i++) {
-                String url =rsBaseUrl + "/" + chapterPath + images.get(i);
-                logger.info("url:{}",url);
-                Map<String,Object>map=new HashMap<>();
-                map.put("comicId",comic.getId());
-                map.put("chapterId",chapter.getId());
-                map.put("lessonId",lesson.getId());
-                downloadService.downloadImage(map,url,i);
+                String url = rsBaseUrl + "/" + chapterPath + images.get(i);
+                logger.info("url:{}", url);
+                Map<String, Object> map = new HashMap<>();
+                map.put("comicId", comic.getId());
+                map.put("chapterId", chapter.getId());
+                map.put("lessonId", lesson.getId());
+                logger.info("开始下载图片,lesson:{}", JsonUtils.toJson(lesson, Lesson.class));
+                downloadService.downloadImage(map, url, i);
                 logger.info("保存成功");
             }
             lessonService.save(lesson);
+            index++;
+            logger.info("进度:{},name:{},url:{}", (float) index / count * 100 + "%", lesson.getName(), lesson.getPage());
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
-
-
-
 
 }
