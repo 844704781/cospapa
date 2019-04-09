@@ -65,8 +65,9 @@ public class LessonCrawler extends BaseSeimiCrawler {
     @Override
     public List<Request> startRequests() {
         List<Request> requests = new LinkedList<>();
-
-        List<Lesson> lessons = lessonService.findAll(new Lesson());
+        Lesson l=new Lesson();
+        l.setStatus(0);
+        List<Lesson> lessons = lessonService.findAll(l);
         count = lessons.size();
         for (int i = 0; i < lessons.size(); i++) {
 
@@ -113,6 +114,7 @@ public class LessonCrawler extends BaseSeimiCrawler {
                 downloadService.downloadImage(map, url, i);
                 logger.info("保存成功");
             }
+            lesson.setStatus(1);
             lessonService.save(lesson);
             index++;
             logger.info("进度:{},name:{},url:{}", (float) index / count * 100 + "%", lesson.getName(), lesson.getPage());

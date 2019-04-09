@@ -43,6 +43,8 @@ public class Lesson {
     @Column(name = "isDeleted")
     private boolean isDeleted;
 
+    private Integer status;
+
     public Lesson(Integer id) {
         this.id = id;
     }
