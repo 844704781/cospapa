@@ -10,11 +10,9 @@ import java.io.File;
 import com.alibaba.druid.support.json.JSONUtils;
 import com.watermelon.seimicrwaler.entity.Chapter;
 import com.watermelon.seimicrwaler.entity.Comic;
+import com.watermelon.seimicrwaler.entity.Content;
 import com.watermelon.seimicrwaler.entity.Lesson;
-import com.watermelon.seimicrwaler.service.ChapterService;
-import com.watermelon.seimicrwaler.service.ComicService;
-import com.watermelon.seimicrwaler.service.DownloadService;
-import com.watermelon.seimicrwaler.service.LessonService;
+import com.watermelon.seimicrwaler.service.*;
 import com.watermelon.seimicrwaler.utils.JsonUtils;
 import com.watermelon.seimicrwaler.utils.RegexUtils;
 
@@ -27,10 +25,7 @@ import org.springframework.scheduling.annotation.Async;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by watermelon on 2019/04/05
@@ -50,6 +45,9 @@ public class LessonCrawler extends BaseSeimiCrawler {
 
     @Autowired
     private ComicService comicService;
+
+    @Autowired
+    private ContentService contentService;
 
     @Autowired
     private DownloadService downloadService;
@@ -95,25 +93,33 @@ public class LessonCrawler extends BaseSeimiCrawler {
         try {
 
             Lesson lesson = lessonService.findOne(new Lesson((Integer) meta.get("lessonId")));
-            Chapter chapter = chapterService.findOne(new Chapter(lesson.getChapterId()));
-            Comic comic = comicService.findOne(new Comic(lesson.getComicId()));
             JXNode script = doc.selNOne(scriptXpath);
             String chapterPath = RegexUtils.filter(script.toString(), CHAPTERPATH, 1);
             List<String> images = RegexUtils.getArraysFilter(script.toString(), IMAGE, 1);
 
             lesson.setPage(images.size());
-
+            Content content=new Content();
+            content.setLessonId(lesson.getId());
+            content.setComicId(lesson.getComicId());
+            content.setChapterId(lesson.getChapterId());
+            
+            List<Content.Image>imageList=new ArrayList<>();
             for (int i = 0; i < images.size(); i++) {
                 String url = rsBaseUrl + "/" + chapterPath + images.get(i);
                 logger.info("url:{}", url);
-                Map<String, Object> map = new HashMap<>();
-                map.put("comicId", comic.getId());
-                map.put("chapterId", chapter.getId());
-                map.put("lessonId", lesson.getId());
+
                 logger.info("开始下载图片,lesson:{}", JsonUtils.toJson(lesson, Lesson.class));
-                downloadService.downloadImage(map, url, i);
+                String hash=downloadService.downloadImage(url);
                 logger.info("保存成功");
+
+                Content.Image image=new Content.Image();
+                image.setHash(hash);
+                image.setIndex(i);
+                imageList.add(image);
             }
+            content.setImages(imageList);
+            contentService.save(content);
+
             lesson.setStatus(1);
             lessonService.save(lesson);
             index++;

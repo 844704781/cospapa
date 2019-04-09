@@ -12,4 +12,8 @@ public class JsonUtils {
     public static String toJson(Object obj, Class cls) {
         return gson.toJson(obj, cls);
     }
+
+    public static ZimgUtils.Response fromJson(String result, Class<ZimgUtils.Response> responseClass) {
+        return gson.fromJson(result,responseClass);
+    }
 }

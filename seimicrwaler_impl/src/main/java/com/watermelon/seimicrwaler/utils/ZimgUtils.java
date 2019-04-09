@@ -1,5 +1,6 @@
 package com.watermelon.seimicrwaler.utils;
 
+import lombok.Data;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -118,5 +119,26 @@ public class ZimgUtils {
         String zimUrl="http://cospapa.cn:4869/upload";
         String result=upload(url,zimUrl);
         System.out.println(result);
+    }
+
+
+    @Data
+    public class Response{
+        private Boolean ret;
+        private Error error;
+        private Info info;
+
+        @Data
+        public class Info{
+            private String md5;
+            private Long size;
+        }
+
+
+        @Data
+        public class Error{
+            private Integer code;
+            private String message;
+        }
     }
 }
