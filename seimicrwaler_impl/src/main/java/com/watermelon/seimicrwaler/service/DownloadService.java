@@ -23,6 +23,6 @@ public class DownloadService {
     public void downloadImage(Map<String,Object> meta,String url,Integer i) throws Exception {
         String path=comicResourcePath+"/"+meta.get("comicId")+"/"+meta.get("chapterId")+"/"+meta.get("lessonId")+"/"+i+".jpg";
         logger.info("线程:{},正在下载",Thread.currentThread().getName());
-        FileUtils.copyURLToFile(new URL(url),FileUtils.getFile(path));
+        FileUtils.copyURLToFile(new URL(url),FileUtils.getFile(path),10000,10000);
     }
 }
