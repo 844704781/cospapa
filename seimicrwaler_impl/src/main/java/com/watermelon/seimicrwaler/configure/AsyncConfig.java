@@ -1,5 +1,8 @@
 package com.watermelon.seimicrwaler.configure;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -24,4 +27,5 @@ public class AsyncConfig implements AsyncConfigurer {
         taskExecutor.initialize();
         return taskExecutor;
     }
+
 }

@@ -64,14 +64,14 @@ public class LessonCrawler extends BaseSeimiCrawler {
     public List<Request> startRequests() {
         List<Request> requests = new LinkedList<>();
         Lesson l=new Lesson();
-        l.setStatus(0);
+        l.setId(33);
         List<Lesson> lessons = lessonService.findAll(l);
         count = lessons.size();
+        logger.info("开始加载lessons,请稍后...");
         for (int i = 0; i < lessons.size(); i++) {
 
             Lesson lesson = lessons.get(i);
             String url = lesson.getPath();
-            logger.info("进度:{},name:{},url:{}", (double) i / count * 100 + "%", lesson.getName(), url);
             Request request = Request.build(url, "start");
             Map<String, Object> map = new HashMap<>();
             map.put("lessonId", lesson.getId());
@@ -79,6 +79,7 @@ public class LessonCrawler extends BaseSeimiCrawler {
             request.setMeta(map);
             requests.add(request);
         }
+        logger.info("加载lessons结束,开始请求数据...");
         return requests;
     }
 
@@ -102,7 +103,7 @@ public class LessonCrawler extends BaseSeimiCrawler {
             content.setLessonId(lesson.getId());
             content.setComicId(lesson.getComicId());
             content.setChapterId(lesson.getChapterId());
-            
+
             List<Content.Image>imageList=new ArrayList<>();
             for (int i = 0; i < images.size(); i++) {
                 String url = rsBaseUrl + "/" + chapterPath + images.get(i);
@@ -119,7 +120,6 @@ public class LessonCrawler extends BaseSeimiCrawler {
             }
             content.setImages(imageList);
             contentService.save(content);
-
             lesson.setStatus(1);
             lessonService.save(lesson);
             index++;

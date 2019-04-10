@@ -17,7 +17,7 @@ public class Content implements Serializable {
     private static final long serialVersionUID=1L;
 
     @Id
-    private Integer id;
+    private String _id;
 
     private Integer lessonId;
     private Integer comicId;
@@ -35,7 +35,7 @@ public class Content implements Serializable {
     @Data
     public static class Image implements Serializable{
         private static final long serialVersionUID=1L;
-        private Integer id;
+
         private String hash;
         private Integer index;
 

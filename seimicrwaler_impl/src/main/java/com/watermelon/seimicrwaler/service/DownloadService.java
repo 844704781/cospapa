@@ -1,11 +1,10 @@
 package com.watermelon.seimicrwaler.service;
 
-import com.watermelon.seimicrwaler.dao.ContentDao;
-import com.watermelon.seimicrwaler.dao.LessonDao;
-import com.watermelon.seimicrwaler.entity.Lesson;
 import com.watermelon.seimicrwaler.utils.JsonUtils;
 import com.watermelon.seimicrwaler.utils.ZimgUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
 
 /**
  * Created by watermelon on 2019/04/06
@@ -30,10 +28,11 @@ public class DownloadService {
 
 
 
+
     @Value("${zimg.base.url}")
     private String zimpUrl;
 
-    public String downloadImage(String url) throws Exception {
+    public  String downloadImage(String url) throws Exception {
         logger.info("线程:{},正在下载",Thread.currentThread().getName());
         String result=ZimgUtils.upload(url,zimpUrl+"/upload");
         ZimgUtils.Response response= JsonUtils.fromJson(result,ZimgUtils.Response.class);
