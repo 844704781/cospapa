@@ -1,5 +1,6 @@
 /impl01/target/
 /seimicrwaler_impl/target/
+/seimicrwaler_impl/logs/
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
