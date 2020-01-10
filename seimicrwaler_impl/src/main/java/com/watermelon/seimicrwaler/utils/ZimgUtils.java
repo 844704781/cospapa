@@ -10,19 +10,19 @@ import lombok.Data;
 public class ZimgUtils {
 
     public static String upload(String url, String zimgUrl) {
-        byte[] bytes = download(url);
-        return upload(zimgUrl, bytes);
+        HttpResponse response = download(url);
+        return upload(zimgUrl, response.bodyBytes(),response.contentType());
     }
 
-    private static byte[] download(String url) {
+    private static HttpResponse download(String url) {
         HttpRequest httpRequest = HttpRequest.get(url);
         HttpResponse httpResponse = httpRequest.send();
-        return httpResponse.bodyBytes();
+        return httpResponse;
     }
 
-    private static String upload(String zimgUrl, byte[] bytes) {
+    private static String upload(String zimgUrl, byte[] bytes,String contentType) {
         HttpRequest httpRequest = HttpRequest.post(zimgUrl)
-                .body(bytes, "jpeg");
+                .body(bytes, contentType);
         HttpResponse httpResponse = httpRequest.send();
         return httpResponse.bodyText();
     }
