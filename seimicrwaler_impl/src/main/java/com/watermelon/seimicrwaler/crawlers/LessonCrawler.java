@@ -120,14 +120,14 @@ public class LessonCrawler extends BaseSeimiCrawler {
                 imageList.add(image);
             }
             content.setImages(imageList);
+            logger.info("保存content,content:{}", content);
             contentService.save(content);
             lesson.setStatus(1);
             lessonService.save(lesson);
             index++;
             logger.info("进度:{},name:{},url:{}", (float) index / count * 100 + "%", lesson.getName(), lesson.getPage());
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            logger.error("cause:", e);
         }
     }
 
