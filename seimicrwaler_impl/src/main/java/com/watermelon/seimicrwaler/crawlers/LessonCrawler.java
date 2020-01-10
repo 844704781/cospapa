@@ -75,10 +75,7 @@ public class LessonCrawler extends BaseSeimiCrawler {
             String url = lesson.getPath();
             Request request = Request.build(url, "start");
             Map<String, Object> map = new HashMap<>();
-            map.put("lessonId", lesson.getId());
-            map.put("url", lesson.getPath());
-            map.put("comicId", lesson.getComicId());
-            map.put("chapterId", lesson.getChapterId());
+            map.put("lesson", JsonUtils.toJson(lesson, lesson.getClass()));
             request.setMeta(map);
             requests.add(request);
             logger.info("进度:{}%", (float) i / lessons.size() * 100);
@@ -101,12 +98,13 @@ public class LessonCrawler extends BaseSeimiCrawler {
             String chapterPath = RegexUtils.filter(script.toString(), CHAPTERPATH, 1);
             List<String> images = RegexUtils.getArraysFilter(script.toString(), IMAGE, 1);
             logger.info("meta:{}", meta);
-            Lesson lesson = new Lesson((Integer) meta.get("lessonId"));
+            Lesson lesson = JsonUtils.fromJson((String) meta.get("lesson"), Lesson.class);
             lesson.setPage(images.size());
+
             Content content = new Content();
             content.setLessonId(lesson.getId());
-            content.setComicId((Integer) meta.get("comicId"));
-            content.setChapterId((Integer) meta.get("chapterId"));
+            content.setComicId((lesson.getComicId());
+            content.setChapterId(lesson.getChapterId());
 
             List<Content.Image> imageList = new ArrayList<>();
             for (int i = 0; i < images.size(); i++) {
