@@ -100,7 +100,6 @@ public class TypeInfoCrawler extends BaseSeimiCrawler {
 
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public void handleEveryPage(Response response) {
         JXDocument doc = response.document();
         String listXpath = "/body[@class='clearfix']/div[@class='wrap']/div[@class='page-main']/div[@class='w998 mt16 cf']/div[@id='w1']/ul[@id='contList']/li[@class='item-lg']";
@@ -121,6 +120,7 @@ public class TypeInfoCrawler extends BaseSeimiCrawler {
                 comicModel.setUrl(url);
                 comicModel.setCoverUrl(coverURL);
                 comicModel.setName(name);
+                logger.info("类型ID:{}查询条件:{}", typeId, comicModel);
                 if (comicService.findAll(comicModel).size() == 0) {
                     logger.info("save comicModel:{}", comicModel);
                     comicModel = comicService.save(comicModel);
