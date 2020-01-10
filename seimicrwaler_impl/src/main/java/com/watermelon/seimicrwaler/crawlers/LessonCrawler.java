@@ -64,11 +64,11 @@ public class LessonCrawler extends BaseSeimiCrawler {
     @Override
     public List<Request> startRequests() {
         List<Request> requests = new LinkedList<>();
-        //Lesson l = new Lesson();
-        //l.setId(33);
-        List<Lesson> lessons = lessonService.findAll(null);
+        Lesson l = new Lesson();
+        l.setStatus(0);
+        List<Lesson> lessons = lessonService.findAll(l);
         count = lessons.size();
-        logger.info("开始加载lessons,请稍后...,总数量:{}",lessons.size());
+        logger.info("开始加载lessons,请稍后...,总数量:{}", lessons.size());
         for (int i = 0; i < lessons.size(); i++) {
 
             Lesson lesson = lessons.get(i);
@@ -77,11 +77,11 @@ public class LessonCrawler extends BaseSeimiCrawler {
             Map<String, Object> map = new HashMap<>();
             map.put("lessonId", lesson.getId());
             map.put("url", lesson.getPath());
-            map.put("comicId",lesson.getComicId());
-            map.put("chapterId",lesson.getChapterId());
+            map.put("comicId", lesson.getComicId());
+            map.put("chapterId", lesson.getChapterId());
             request.setMeta(map);
             requests.add(request);
-	    logger.info("进度:{}",i/lessons.size());
+            logger.info("进度:{}%", (float) i / lessons.size() * 100);
         }
         logger.info("加载lessons结束,开始请求数据...");
         return requests;
@@ -100,7 +100,8 @@ public class LessonCrawler extends BaseSeimiCrawler {
             JXNode script = doc.selNOne(scriptXpath);
             String chapterPath = RegexUtils.filter(script.toString(), CHAPTERPATH, 1);
             List<String> images = RegexUtils.getArraysFilter(script.toString(), IMAGE, 1);
-            Lesson lesson=new Lesson((Integer) meta.get("lessonId"));;
+            Lesson lesson = new Lesson((Integer) meta.get("lessonId"));
+            ;
             lesson.setPage(images.size());
             Content content = new Content();
             content.setLessonId(lesson.getId());
