@@ -150,9 +150,9 @@ public class ProfileCrawler extends BaseSeimiCrawler {
                     String lessonName = elements.get(0).text();
                     lesson.setName(lessonName);
                     lesson.setStatus(0);
-                    if(lessonService.findAll(lesson).size()==0){
-                        lessons.add(lesson);
-                    }
+                    //if(lessonService.findAll(lesson).size()==0){
+                    lessons.add(lesson);
+                    //}
                 }
                 comicService.saveChapter(chapter, lessons);
                 index++;
