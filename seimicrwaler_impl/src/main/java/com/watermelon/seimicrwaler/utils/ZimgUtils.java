@@ -15,7 +15,7 @@ public class ZimgUtils {
 
     public static String upload(String url, String zimgUrl) {
         HttpResponse response = download(url);
-        logger.info("download response:{}", response);
+        logger.info("download response:{}", response.contentType());
         return upload(zimgUrl, response.bodyBytes(), response.contentType());
     }
 
@@ -27,7 +27,7 @@ public class ZimgUtils {
 
     private static String upload(String zimgUrl, byte[] bytes, String contentType) {
         HttpRequest httpRequest = HttpRequest.post(zimgUrl)
-                .body(bytes, contentType);
+                .body(bytes, "jpeg");
         HttpResponse httpResponse = httpRequest.send();
         return httpResponse.bodyText();
     }
