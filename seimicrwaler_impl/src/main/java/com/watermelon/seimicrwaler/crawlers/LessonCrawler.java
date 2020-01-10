@@ -64,11 +64,11 @@ public class LessonCrawler extends BaseSeimiCrawler {
     @Override
     public List<Request> startRequests() {
         List<Request> requests = new LinkedList<>();
-        Lesson l = new Lesson();
-        l.setId(33);
-        List<Lesson> lessons = lessonService.findAll(l);
+        //Lesson l = new Lesson();
+        //l.setId(33);
+        List<Lesson> lessons = lessonService.findAll(null);
         count = lessons.size();
-        logger.info("开始加载lessons,请稍后...");
+        logger.info("开始加载lessons,请稍后...,总数量:{}",lessons.size());
         for (int i = 0; i < lessons.size(); i++) {
 
             Lesson lesson = lessons.get(i);
@@ -81,6 +81,7 @@ public class LessonCrawler extends BaseSeimiCrawler {
             map.put("chapterId",lesson.getChapterId());
             request.setMeta(map);
             requests.add(request);
+	    logger.info("进度:{}",i/lessons.size());
         }
         logger.info("加载lessons结束,开始请求数据...");
         return requests;
