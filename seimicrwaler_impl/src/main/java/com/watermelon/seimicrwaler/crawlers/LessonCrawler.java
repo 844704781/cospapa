@@ -100,8 +100,8 @@ public class LessonCrawler extends BaseSeimiCrawler {
             JXNode script = doc.selNOne(scriptXpath);
             String chapterPath = RegexUtils.filter(script.toString(), CHAPTERPATH, 1);
             List<String> images = RegexUtils.getArraysFilter(script.toString(), IMAGE, 1);
+            logger.info("meta:{}", meta);
             Lesson lesson = new Lesson((Integer) meta.get("lessonId"));
-            ;
             lesson.setPage(images.size());
             Content content = new Content();
             content.setLessonId(lesson.getId());
@@ -123,10 +123,11 @@ public class LessonCrawler extends BaseSeimiCrawler {
                 imageList.add(image);
             }
             content.setImages(imageList);
-            logger.info("保存content,content:{}", content);
             contentService.save(content);
+            logger.info("保存content,content:{}", content);
             lesson.setStatus(1);
             lessonService.save(lesson);
+            logger.info("更新lesson,lesson:{}", lesson);
             index++;
             logger.info("进度:{},name:{},url:{}", (float) index / count * 100 + "%", lesson.getName(), lesson.getPage());
         } catch (Exception e) {
