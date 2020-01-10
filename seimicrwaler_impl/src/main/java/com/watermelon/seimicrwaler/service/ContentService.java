@@ -18,7 +18,7 @@ public class ContentService {
 
     public Content save(Content content) {
 
-        Date now =new Date();
+        Date now = new Date();
         content.setCreateTime(now);
         content.setUpdateTime(now);
         content.setDeleted(false);

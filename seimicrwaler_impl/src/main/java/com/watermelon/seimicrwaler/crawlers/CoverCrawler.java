@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 /**
+ * 获取封面，还没写
  * Created by watermelon on 2019/04/09
  */
 @Crawler(name = "crawler")
@@ -25,10 +26,10 @@ public class CoverCrawler extends BaseSeimiCrawler {
     @Override
     public String[] startUrls() {
 
-        Comic comic=new Comic();
-        List<Comic> comicList=comicService.findAll(comic);
-        for(Comic c:comicList){
-            downloadService.downloadCover(c.getUrl(),c.getId());
+        Comic comic = new Comic();
+        List<Comic> comicList = comicService.findAll(comic);
+        for (Comic c : comicList) {
+            downloadService.downloadCover(c.getUrl(), c.getId());
         }
         return null;
     }

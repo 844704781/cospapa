@@ -80,7 +80,6 @@ public class ComicService {
         return comicDao.findAll(Example.of(comic), PageRequest.of(page, size));
     }
 
-
     public void saveChapter(Chapter chapter, List<Lesson> lessonList) {
         Chapter m = chapterDao.findOne(Example.of(chapter)).orElse(null);
         Date now = new Date();
@@ -98,7 +97,7 @@ public class ComicService {
             for (Lesson lesson : lessonList) {
                 List<Lesson> n = lessonDao.findAll(Example.of(lesson));
                 if (n.size() > 0) {
-		    logger.info("不保存lesson,因为数据已存在,为:{}",JsonUtils.toJson(n,List.class));
+                    logger.info("不保存lesson,因为数据已存在,为:{}", JsonUtils.toJson(n, List.class));
                     break;
                 }
                 lesson.setChapterId(model.getId());

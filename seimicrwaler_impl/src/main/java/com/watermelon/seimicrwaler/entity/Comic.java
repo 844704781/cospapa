@@ -43,7 +43,7 @@ public class Comic {
         this.url = url;
     }
 
-    public Comic(){
+    public Comic() {
 
     }
 }

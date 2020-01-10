@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
 
 /**
+ * 爬取类型，第一步
  * Created by watermelon on 2019/04/04
  */
 @Crawler(name = "basic")

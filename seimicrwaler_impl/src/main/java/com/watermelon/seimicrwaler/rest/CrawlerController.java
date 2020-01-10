@@ -25,9 +25,8 @@ public class CrawlerController {
     @GetMapping("/comic")
     public ResponseObject comic(String name) {
         CrawlerModel model = CrawlerCache.getCrawlerModel(name);
-        if(model==null)
-        {
-            return new ResponseObject(-1,"model 没有找到");
+        if (model == null) {
+            return new ResponseObject(-1, "model 没有找到");
         }
         model.startRequest();
         return new ResponseObject(0);

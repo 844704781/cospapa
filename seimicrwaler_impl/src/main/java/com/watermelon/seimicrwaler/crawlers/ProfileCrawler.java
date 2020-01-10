@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.*;
 
 /**
+ * 获取漫画的url，第三步
  * Created by watermelon on 2019/04/04
  */
 @Crawler(name = "profile")
@@ -53,7 +54,7 @@ public class ProfileCrawler extends BaseSeimiCrawler {
 
         logger.info("comic表开始时间:{}", new Date());
 
-        Comic c =new Comic();
+        Comic c = new Comic();
         c.setDeleted(false);
         List<Comic> comicList = comicService.findAll(c);
         logger.info("comic表结束时间:{}", new Date());

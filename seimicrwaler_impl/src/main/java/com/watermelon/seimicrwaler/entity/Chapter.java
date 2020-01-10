@@ -32,12 +32,11 @@ public class Chapter {
     @Column(name = "isDeleted")
     private boolean isDeleted;
 
-
-    public Chapter(Integer id){
-        this.id=id;
+    public Chapter(Integer id) {
+        this.id = id;
     }
 
-    public Chapter(){
+    public Chapter() {
 
     }
 }

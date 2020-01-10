@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @Document
 public class Content implements Serializable {
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @Id
     private String _id;
@@ -31,10 +31,9 @@ public class Content implements Serializable {
 
     private boolean isDeleted;
 
-
     @Data
-    public static class Image implements Serializable{
-        private static final long serialVersionUID=1L;
+    public static class Image implements Serializable {
+        private static final long serialVersionUID = 1L;
 
         private String hash;
         private Integer index;

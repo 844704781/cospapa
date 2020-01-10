@@ -27,7 +27,6 @@ public class LessonService {
     @Autowired
     private LessonDao lessonDao;
 
-
     public Lesson findOne(Lesson lesson) {
         Example<Lesson> example = Example.of(lesson);
         Optional<Lesson> optional = lessonDao.findOne(example);

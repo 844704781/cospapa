@@ -49,7 +49,7 @@ public class Lesson {
         this.id = id;
     }
 
-    public Lesson(){
+    public Lesson() {
 
     }
 }

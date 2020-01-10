@@ -28,6 +28,7 @@ import java.net.URL;
 import java.util.*;
 
 /**
+ * 开始下载图片，最后一步
  * Created by watermelon on 2019/04/05
  */
 @Crawler(name = "lesson")
@@ -63,7 +64,7 @@ public class LessonCrawler extends BaseSeimiCrawler {
     @Override
     public List<Request> startRequests() {
         List<Request> requests = new LinkedList<>();
-        Lesson l=new Lesson();
+        Lesson l = new Lesson();
         l.setId(33);
         List<Lesson> lessons = lessonService.findAll(l);
         count = lessons.size();
@@ -99,21 +100,21 @@ public class LessonCrawler extends BaseSeimiCrawler {
             List<String> images = RegexUtils.getArraysFilter(script.toString(), IMAGE, 1);
 
             lesson.setPage(images.size());
-            Content content=new Content();
+            Content content = new Content();
             content.setLessonId(lesson.getId());
             content.setComicId(lesson.getComicId());
             content.setChapterId(lesson.getChapterId());
 
-            List<Content.Image>imageList=new ArrayList<>();
+            List<Content.Image> imageList = new ArrayList<>();
             for (int i = 0; i < images.size(); i++) {
                 String url = rsBaseUrl + "/" + chapterPath + images.get(i);
                 logger.info("url:{}", url);
 
                 logger.info("开始下载图片,lesson:{}", JsonUtils.toJson(lesson, Lesson.class));
-                String hash=downloadService.downloadImage(url);
+                String hash = downloadService.downloadImage(url);
                 logger.info("保存成功");
 
-                Content.Image image=new Content.Image();
+                Content.Image image = new Content.Image();
                 image.setHash(hash);
                 image.setIndex(i);
                 imageList.add(image);

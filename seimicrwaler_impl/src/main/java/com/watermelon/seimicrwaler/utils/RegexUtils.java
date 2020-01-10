@@ -19,7 +19,7 @@ public class RegexUtils {
         return null;
     }
 
-    public static List<String> getArraysFilter(String content, String regex , Integer index) {
+    public static List<String> getArraysFilter(String content, String regex, Integer index) {
         Pattern p = Pattern.compile(regex);
         Matcher matcher = p.matcher(content);
         List<String> list = new ArrayList<>();
@@ -28,6 +28,5 @@ public class RegexUtils {
         }
         return list;
     }
-
 
 }

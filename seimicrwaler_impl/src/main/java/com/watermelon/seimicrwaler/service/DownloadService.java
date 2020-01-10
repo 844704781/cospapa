@@ -26,46 +26,38 @@ public class DownloadService {
     @Value("${comic.resource.path}")
     private String comicResourcePath;
 
-
-
-
     @Value("${zimg.base.url}")
     private String zimpUrl;
 
-    public  String downloadImage(String url) throws Exception {
-        logger.info("线程:{},正在下载",Thread.currentThread().getName());
-        String result=ZimgUtils.upload(url,zimpUrl+"/upload");
-        ZimgUtils.Response response= JsonUtils.fromJson(result,ZimgUtils.Response.class);
-        if(response.getRet().equals(false))
-        {
-            logger.error("将图片存入zimp失败,图片url:{},zimp响应信息为:{}",url,JsonUtils.toJson(response.getError(),ZimgUtils.Response.Error.class));
+    public String downloadImage(String url) throws Exception {
+        logger.info("线程:{},正在下载", Thread.currentThread().getName());
+        String result = ZimgUtils.upload(url, zimpUrl + "/upload");
+        ZimgUtils.Response response = JsonUtils.fromJson(result, ZimgUtils.Response.class);
+        if (response.getRet().equals(false)) {
+            logger.error("将图片存入zimp失败,图片url:{},zimp响应信息为:{}", url, JsonUtils.toJson(response.getError(), ZimgUtils.Response.Error.class));
             throw new RuntimeException("将图片存入zimp失败");
         }
 
         return response.getInfo().getMd5();
     }
 
-
-
-
-
     @Async
     public void downloadCover(String url, Integer id) {
-        String path=comicResourcePath+"/"+id+"/"+"cover.jpg";
-        logger.info("线程:{},正在下载",Thread.currentThread().getName());
+        String path = comicResourcePath + "/" + id + "/" + "cover.jpg";
+        logger.info("线程:{},正在下载", Thread.currentThread().getName());
         try {
-            FileUtils.copyURLToFile(new URL(url),FileUtils.getFile(path),10000,10000);
+            FileUtils.copyURLToFile(new URL(url), FileUtils.getFile(path), 10000, 10000);
         } catch (IOException e) {
-            logger.info("线程:{},下载失败,正在重新下载,url:{}",Thread.currentThread().getName(),url);
+            logger.info("线程:{},下载失败,正在重新下载,url:{}", Thread.currentThread().getName(), url);
             try {
-                FileUtils.copyURLToFile(new URL(url),FileUtils.getFile(path),10000,10000);
+                FileUtils.copyURLToFile(new URL(url), FileUtils.getFile(path), 10000, 10000);
             } catch (IOException e1) {
-                logger.info("线程:{},下载失败,正在重新下载,url:{}",Thread.currentThread().getName(),url);
+                logger.info("线程:{},下载失败,正在重新下载,url:{}", Thread.currentThread().getName(), url);
                 try {
-                    FileUtils.copyURLToFile(new URL(url),FileUtils.getFile(path),10000,10000);
+                    FileUtils.copyURLToFile(new URL(url), FileUtils.getFile(path), 10000, 10000);
                 } catch (IOException e2) {
                     e2.printStackTrace();
-                    logger.info("线程:{},下载失败,url:{}",Thread.currentThread().getName(),url);
+                    logger.info("线程:{},下载失败,url:{}", Thread.currentThread().getName(), url);
                 }
 
             }

@@ -14,6 +14,6 @@ public class JsonUtils {
     }
 
     public static ZimgUtils.Response fromJson(String result, Class<ZimgUtils.Response> responseClass) {
-        return gson.fromJson(result,responseClass);
+        return gson.fromJson(result, responseClass);
     }
 }

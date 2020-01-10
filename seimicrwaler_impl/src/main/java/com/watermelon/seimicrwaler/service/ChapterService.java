@@ -18,10 +18,8 @@ import java.util.Optional;
 @Service
 public class ChapterService {
 
-
     @Autowired
     private ChapterDao chapterDao;
-
 
     public Chapter findOne(Chapter chapter) {
         Example<Chapter> example = Example.of(chapter);

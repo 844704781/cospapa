@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
+ * 获取每种类型的信息，第二步
  * Created by watermelon on 2019/04/04
  */
 @Crawler(name = "typeInfo")
