@@ -77,6 +77,8 @@ public class LessonCrawler extends BaseSeimiCrawler {
             Map<String, Object> map = new HashMap<>();
             map.put("lessonId", lesson.getId());
             map.put("url", lesson.getPath());
+            map.put("comicId",lesson.getComicId());
+            map.put("chapterId",lesson.getChapterId());
             request.setMeta(map);
             requests.add(request);
         }
@@ -94,23 +96,22 @@ public class LessonCrawler extends BaseSeimiCrawler {
 
         try {
 
-            Lesson lesson = lessonService.findOne(new Lesson((Integer) meta.get("lessonId")));
             JXNode script = doc.selNOne(scriptXpath);
             String chapterPath = RegexUtils.filter(script.toString(), CHAPTERPATH, 1);
             List<String> images = RegexUtils.getArraysFilter(script.toString(), IMAGE, 1);
-
+            Lesson lesson=new Lesson((Integer) meta.get("lessonId"));;
             lesson.setPage(images.size());
             Content content = new Content();
             content.setLessonId(lesson.getId());
-            content.setComicId(lesson.getComicId());
-            content.setChapterId(lesson.getChapterId());
+            content.setComicId((Integer) meta.get("comicId"));
+            content.setChapterId((Integer) meta.get("chapterId"));
 
             List<Content.Image> imageList = new ArrayList<>();
             for (int i = 0; i < images.size(); i++) {
                 String url = rsBaseUrl + "/" + chapterPath + images.get(i);
                 logger.info("url:{}", url);
 
-                logger.info("开始下载图片,lesson:{}", JsonUtils.toJson(lesson, Lesson.class));
+                logger.info("开始下载图片,lesson:{}", lesson);
                 String hash = downloadService.downloadImage(url);
                 logger.info("保存成功");
 
