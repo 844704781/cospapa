@@ -27,22 +27,32 @@ public class DownloadService {
     @Value("${zimg.base.url}")
     private String zimpUrl;
 
-    public String downloadImage(String url) throws Exception {
+    public String downloadImage(String url) {
+        return downloadImage(url, null);
+    }
+
+    public String downloadImage(String url, Integer retryCount) {
+        if (retryCount == null) {
+            retryCount = 0;
+        }
         logger.info("线程:{},正在下载", Thread.currentThread().getName());
         String result = ZimgUtils.upload(url, zimpUrl + "/upload");
         ZimgUtils.Response response = JsonUtils.fromJson(result, ZimgUtils.Response.class);
         if (response.getRet().equals(false)) {
             logger.error("将图片存入zimp失败,图片url:{},zimp响应信息为:{}", url, JsonUtils.toJson(response.getError(), ZimgUtils.Response.Error.class));
-            throw new RuntimeException("将图片存入zimp失败");
+            if (retryCount >= 3) {
+                throw new RuntimeException("将图片存入zimp失败");
+            }
+            downloadImage(url, ++retryCount);
         }
 
         return response.getInfo().getMd5();
     }
 
-    public void downloadImage(Map<String,Object> meta,String url,Integer i) throws Exception {
-        String path=comicResourcePath+"/"+meta.get("comicId")+"/"+meta.get("chapterId")+"/"+meta.get("lessonId")+"/"+i+".jpg";
-        logger.info("线程:{},正在下载",Thread.currentThread().getName());
-        FileUtils.copyURLToFile(new URL(url),FileUtils.getFile(path),10000,10000);
+    public void downloadImage(Map<String, Object> meta, String url, Integer i) throws Exception {
+        String path = comicResourcePath + "/" + meta.get("comicId") + "/" + meta.get("chapterId") + "/" + meta.get("lessonId") + "/" + i + ".jpg";
+        logger.info("线程:{},正在下载", Thread.currentThread().getName());
+        FileUtils.copyURLToFile(new URL(url), FileUtils.getFile(path), 10000, 10000);
     }
 
     @Async

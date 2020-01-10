@@ -103,7 +103,7 @@ public class LessonCrawler extends BaseSeimiCrawler {
 
             Content content = new Content();
             content.setLessonId(lesson.getId());
-            content.setComicId((lesson.getComicId());
+            content.setComicId(lesson.getComicId());
             content.setChapterId(lesson.getChapterId());
 
             List<Content.Image> imageList = new ArrayList<>();

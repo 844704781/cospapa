@@ -3,8 +3,7 @@ package com.watermelon.seimicrwaler.service;
 import com.watermelon.seimicrwaler.dao.ChapterDao;
 import com.watermelon.seimicrwaler.dao.LessonDao;
 import com.watermelon.seimicrwaler.dao.LessonDao;
-import com.watermelon.seimicrwaler.entity.Chapter;
-import com.watermelon.seimicrwaler.entity.Lesson;
+import com.watermelon.seimicrwaler.entity.*;
 import com.watermelon.seimicrwaler.entity.Lesson;
 import com.watermelon.seimicrwaler.entity.Lesson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +26,9 @@ public class LessonService {
 
     @Autowired
     private LessonDao lessonDao;
+
+    @Autowired
+    private DownloadService downloadService;
 
     public Lesson findOne(Lesson lesson) {
         Example<Lesson> example = Example.of(lesson);
