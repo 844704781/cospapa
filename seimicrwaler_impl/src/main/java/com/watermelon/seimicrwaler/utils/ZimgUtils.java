@@ -1,38 +1,16 @@
 package com.watermelon.seimicrwaler.utils;
 
-import jdk.nashorn.internal.AssertsEnabled;
 import jodd.http.HttpRequest;
 import jodd.http.HttpResponse;
 import lombok.Data;
-import net.coobird.thumbnailator.Thumbnails;
-import org.apache.commons.io.IOUtils;
-
-import java.io.*;
 
 /**
  * Created by watermelon on 2019/04/09
  */
 public class ZimgUtils {
 
-    /**
-     * 压缩比例
-     */
-    private static float qualitySize = 0.5f;
-
     public static String upload(String url, String zimgUrl) {
         byte[] bytes = download(url);
-        //        InputStream inputStream=new ByteArrayInputStream(bytes);
-        //        OutputStream outputStream=new ByteArrayOutputStream();
-        //        try {
-        //            Thumbnails.of(inputStream).scale(1f).outputQuality(qualitySize).toOutputStream(outputStream);
-        //            bytes=((ByteArrayOutputStream) outputStream).toByteArray();
-        //
-        //            outputStream.close();
-        //            inputStream.close();
-        //        } catch (IOException e) {
-        //            e.printStackTrace();
-        //            throw new RuntimeException(e);
-        //        }
         return upload(zimgUrl, bytes);
     }
 

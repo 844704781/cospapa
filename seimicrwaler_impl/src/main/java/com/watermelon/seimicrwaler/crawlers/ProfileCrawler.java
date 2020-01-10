@@ -58,7 +58,6 @@ public class ProfileCrawler extends BaseSeimiCrawler {
         c.setDeleted(false);
         List<Comic> comicList = comicService.findAll(c);
         logger.info("comic表结束时间:{}", new Date());
-        logger.info("chapter表开始时间:{}", new Date());
 
         for (int i = 0; i < comicList.size(); i++) {
             Comic comic = comicList.get(i);
@@ -68,20 +67,27 @@ public class ProfileCrawler extends BaseSeimiCrawler {
             map.put("url", comic.getUrl());
             request.setMeta(map);
 
-            Chapter tmp = new Chapter();
+            /**
+             * 判断是否爬取漫画的章节
+             */
+            Chapter chapter = new Chapter();
             List<Chapter> chapters = null;
-            tmp.setComicId(comic.getId());
-            chapters = chapterService.page(tmp, 0, 1).getContent();
+            chapter.setComicId(comic.getId());
+            chapters = chapterService.page(chapter, 0, 1).getContent();
             Lesson lesson = null;
             List<Lesson> lessons = null;
-            if (tmp != null) {
+            if (chapters.size() != 0) {
+                //判断是否爬取章节下的小结
                 lesson = new Lesson();
-                lesson.setChapterId(tmp.getId());
+                lesson.setChapterId(chapter.getId());
                 lesson.setComicId(comic.getId());
                 lessons = lessonService.page(lesson, 0, 1).getContent();
-
             }
             logger.info("查询chapter进度:{}", (double) i / comicList.size() * 100 + "%");
+
+            /**
+             * 如果没有爬过章节或者没有爬过小节，则放入爬虫队列
+             */
             if (chapters.size() == 0 || lessons.size() == 0) {
                 requests.add(request);
                 logger.info("comic的数量:{}", requests.size());
@@ -150,9 +156,7 @@ public class ProfileCrawler extends BaseSeimiCrawler {
                 logger.info("进度:{}", (double) index / count * 100 + "%");
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("漫画ID:{},URL:{},异常:{}", meta.get("comicId"), meta.get("url"), e.getMessage());
-            throw new RuntimeException(e);
+            logger.error("漫画ID:{},URL:{},异常:", meta.get("comicId"), meta.get("url"), e);
         }
     }
 }

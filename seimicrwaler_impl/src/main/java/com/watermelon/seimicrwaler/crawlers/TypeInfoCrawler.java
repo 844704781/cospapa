@@ -16,6 +16,8 @@ import org.jsoup.nodes.Element;
 import org.seimicrawler.xpath.JXDocument;
 import org.seimicrawler.xpath.JXNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,6 +81,8 @@ public class TypeInfoCrawler extends BaseSeimiCrawler {
             typeInfo.setLastIndex(lastIndex);
             typeInfoService.saveOrUpdate(typeInfo);
 
+            logger.info("type:{}",type);
+            logger.info("typeInfo:{}",typeInfo);
             for (int i = 0; i < lastIndex; i++) {
                 String url = type.getUrl() + i + "/";
                 Request request = Request.build(url, TypeInfoCrawler::handleEveryPage);
@@ -86,6 +90,7 @@ public class TypeInfoCrawler extends BaseSeimiCrawler {
                 map.put("typeId", type.getId());
                 request.setMeta(map);
                 push(request);
+                logger.info("推入队列:(i:{},lastIndex:{})", i, lastIndex);
             }
 
         } catch (Exception e) {
@@ -95,6 +100,7 @@ public class TypeInfoCrawler extends BaseSeimiCrawler {
 
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void handleEveryPage(Response response) {
         JXDocument doc = response.document();
         String listXpath = "/body[@class='clearfix']/div[@class='wrap']/div[@class='page-main']/div[@class='w998 mt16 cf']/div[@id='w1']/ul[@id='contList']/li[@class='item-lg']";
@@ -115,15 +121,17 @@ public class TypeInfoCrawler extends BaseSeimiCrawler {
                 comicModel.setUrl(url);
                 comicModel.setCoverUrl(coverURL);
                 comicModel.setName(name);
-                comicModel = comicService.save(comicModel);
+                if (comicService.findAll(comicModel).size() == 0) {
+                    logger.info("save comicModel:{}", comicModel);
+                    comicModel = comicService.save(comicModel);
 
-                ComicType comicType = new ComicType(comicModel.getId(), typeId);
-
-                comicTypeService.save(comicType);
-
+                    ComicType comicType = new ComicType(comicModel.getId(), typeId);
+                    logger.info("save comic type:{}", comicType);
+                    comicTypeService.save(comicType);
+                }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("cause:", e);
             //#TODO 记录抓取出错
         }
     }
