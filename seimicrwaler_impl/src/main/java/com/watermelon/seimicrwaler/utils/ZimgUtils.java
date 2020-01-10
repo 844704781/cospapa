@@ -3,15 +3,20 @@ package com.watermelon.seimicrwaler.utils;
 import jodd.http.HttpRequest;
 import jodd.http.HttpResponse;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by watermelon on 2019/04/09
  */
 public class ZimgUtils {
 
+    protected static Logger logger = LoggerFactory.getLogger(ZimgUtils.class);
+
     public static String upload(String url, String zimgUrl) {
         HttpResponse response = download(url);
-        return upload(zimgUrl, response.bodyBytes(),response.contentType());
+        logger.info("download response:{}", response);
+        return upload(zimgUrl, response.bodyBytes(), response.contentType());
     }
 
     private static HttpResponse download(String url) {
@@ -20,7 +25,7 @@ public class ZimgUtils {
         return httpResponse;
     }
 
-    private static String upload(String zimgUrl, byte[] bytes,String contentType) {
+    private static String upload(String zimgUrl, byte[] bytes, String contentType) {
         HttpRequest httpRequest = HttpRequest.post(zimgUrl)
                 .body(bytes, contentType);
         HttpResponse httpResponse = httpRequest.send();
