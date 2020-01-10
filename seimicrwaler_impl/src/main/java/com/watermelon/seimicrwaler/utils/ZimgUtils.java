@@ -16,7 +16,7 @@ public class ZimgUtils {
     public static String upload(String url, String zimgUrl) {
         HttpResponse response = download(url);
         if (response.contentType() == null) {
-            logger.info("download response:{}", response.contentLength());
+            logger.info("download response:{}", response);
         }
         return upload(zimgUrl, response.bodyBytes());
     }

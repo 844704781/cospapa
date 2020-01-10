@@ -38,6 +38,7 @@ public class DownloadService {
         logger.info("线程:{},正在下载", Thread.currentThread().getName());
         String result = ZimgUtils.upload(url, zimpUrl + "/upload");
         ZimgUtils.Response response = JsonUtils.fromJson(result, ZimgUtils.Response.class);
+        logger.info("response:{}", response.getInfo());
         if (response.getRet().equals(false)) {
             logger.error("将图片存入zimp失败,图片url:{},zimp响应信息为:{}", url, JsonUtils.toJson(response.getError(), ZimgUtils.Response.Error.class));
             if (retryCount >= 3) {
@@ -45,7 +46,10 @@ public class DownloadService {
             }
             downloadImage(url, ++retryCount);
         }
-
+        if (response == null || response.getInfo() == null || response.getInfo().getMd5() == null) {
+            logger.error("response:{}", response);
+            return downloadImage(url, retryCount++);
+        }
         return response.getInfo().getMd5();
     }
 
