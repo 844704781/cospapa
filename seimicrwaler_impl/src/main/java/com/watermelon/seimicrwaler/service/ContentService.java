@@ -1,7 +1,7 @@
 package com.watermelon.seimicrwaler.service;
 
-import com.watermelon.seimicrwaler.dao.ContentDao;
 import com.watermelon.seimicrwaler.entity.Content;
+import com.watermelon.seimicrwaler.mongoDao.ContentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,15 +14,13 @@ import java.util.Date;
 public class ContentService {
 
     @Autowired
-    private ContentDao contentDao;
+    private ContentRepository contentRepository;
 
     public Content save(Content content) {
-
         Date now = new Date();
         content.setCreateTime(now);
         content.setUpdateTime(now);
         content.setDeleted(false);
-
-        return contentDao.save(content);
+        return contentRepository.save(content);
     }
 }

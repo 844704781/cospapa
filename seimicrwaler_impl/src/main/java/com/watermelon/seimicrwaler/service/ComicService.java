@@ -83,27 +83,27 @@ public class ComicService {
 
     @Transactional(rollbackFor = Exception.class)
     public void saveChapter(Chapter chapter, List<Lesson> lessonList) {
-        Chapter m = chapterDao.findOne(Example.of(chapter)).orElse(null);
+        Chapter chapterModel = chapterDao.findOne(Example.of(chapter)).orElse(null);
         Date now = new Date();
-        if (m != null) {
-            chapter.setId(m.getId());
+        if (chapterModel == null) {
+            chapter.setCreateTime(now);
+            chapter.setUpdateTime(now);
+            chapter.setDeleted(false);
+            logger.info("{},开始保存chapter数据,chapter:{}", Thread.currentThread().getName(), chapter);
+            chapterModel = chapterDao.save(chapter);
         }
-        chapter.setCreateTime(now);
-        chapter.setUpdateTime(now);
-        chapter.setDeleted(false);
-        logger.info("{},开始保存chapter数据,chapter:{}", Thread.currentThread().getName(), chapter);
-        Chapter model = chapterDao.save(chapter);
+
         logger.info("{},数据保存成功,返回chapter:{}", Thread.currentThread().getName(), chapter);
         List<Lesson> lessons = new ArrayList<>();
         if (lessonList != null) {
             for (Lesson lesson : lessonList) {
                 List<Lesson> n = lessonDao.findAll(Example.of(lesson));
                 if (n.size() > 0) {
-                    logger.info("不保存lesson,因为数据已存在,为:{}", JsonUtils.toJson(n, List.class));
+                    logger.info("不保存lesson,因为数据已存在,为:{}", n);
                     break;
                 }
-                lesson.setChapterId(model.getId());
-                lesson.setComicId(model.getComicId());
+                lesson.setChapterId(chapterModel.getId());
+                lesson.setComicId(chapterModel.getComicId());
                 lesson.setCreateTime(now);
                 lesson.setUpdateTime(now);
                 lesson.setDeleted(false);

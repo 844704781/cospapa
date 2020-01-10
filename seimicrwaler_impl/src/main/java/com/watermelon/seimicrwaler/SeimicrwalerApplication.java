@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @SpringBootApplication
-@EnableMongoRepositories(basePackages = "com.watermelon.seimicrwaler.dao")
+@EnableMongoRepositories(basePackages = "com.watermelon.seimicrwaler.mongoDao")
 public class SeimicrwalerApplication {
 
     public static void main(String[] args) {
