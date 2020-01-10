@@ -107,29 +107,29 @@ public class TypeInfoCrawler extends BaseSeimiCrawler {
             List<JXNode> comicList = doc.selN(listXpath);
             for (JXNode jxNode : comicList) {
                 Element comic = jxNode.asElement();
-                Element a = comic.getElementsByTag("a").first();
-                String url = a.attr("href");
-                String name = a.attr("title");
-                String coverURL = a.getElementsByTag("img").first().attr("src");
-                Integer typeId = (Integer) response.getMeta().get("typeId");
+            Element a = comic.getElementsByTag("a").first();
+            String url = a.attr("href");
+            String name = a.attr("title");
+            String coverURL = a.getElementsByTag("img").first().attr("src");
+            Integer typeId = (Integer) response.getMeta().get("typeId");
 
-                /**
-                 * 更新comic
-                 */
-                Comic comicModel = new Comic();
-                comicModel.setUrl(url);
-                comicModel.setCoverUrl(coverURL);
-                comicModel.setName(name);
-                logger.info("类型ID:{}查询条件:{}", typeId, comicModel);
-                if (comicService.findAll(comicModel).size() == 0) {
-                    logger.info("save comicModel:{}", comicModel);
-                    comicModel = comicService.save(comicModel);
+            /**
+             * 更新comic
+             */
+            Comic comicModel = new Comic();
+            comicModel.setUrl(url);
+            comicModel.setCoverUrl(coverURL);
+            comicModel.setName(name);
+            logger.info("类型ID:{}查询条件:{}", typeId, comicModel);
+            if (comicService.findAll(comicModel).size() == 0) {
+                logger.info("save comicModel:{}", comicModel);
+                comicModel = comicService.save(comicModel);
 
-                    ComicType comicType = new ComicType(comicModel.getId(), typeId);
-                    logger.info("save comic type:{}", comicType);
-                    comicTypeService.save(comicType);
-                }
+                ComicType comicType = new ComicType(comicModel.getId(), typeId);
+                logger.info("save comic type:{}", comicType);
+                comicTypeService.save(comicType);
             }
+        }
         } catch (Exception e) {
             logger.error("cause:", e);
             //#TODO 记录抓取出错
