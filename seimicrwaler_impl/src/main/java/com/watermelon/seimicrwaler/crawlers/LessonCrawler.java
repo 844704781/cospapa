@@ -2,6 +2,8 @@ package com.watermelon.seimicrwaler.crawlers;
 
 import cn.wanghaomiao.seimi.annotation.Crawler;
 import cn.wanghaomiao.seimi.def.BaseSeimiCrawler;
+import cn.wanghaomiao.seimi.spring.common.CrawlerCache;
+import cn.wanghaomiao.seimi.struct.CrawlerModel;
 import cn.wanghaomiao.seimi.struct.Request;
 import cn.wanghaomiao.seimi.struct.Response;
 
@@ -16,11 +18,14 @@ import com.watermelon.seimicrwaler.service.*;
 import com.watermelon.seimicrwaler.utils.JsonUtils;
 import com.watermelon.seimicrwaler.utils.RegexUtils;
 
+import com.watermelon.seimicrwaler.utils.ResponseObject;
 import org.apache.commons.io.FileUtils;
 import org.seimicrawler.xpath.JXDocument;
 import org.seimicrawler.xpath.JXNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
 
 import java.net.MalformedURLException;
@@ -63,11 +68,17 @@ public class LessonCrawler extends BaseSeimiCrawler {
 
     @Override
     public List<Request> startRequests() {
+        index = 0;
         List<Request> requests = new LinkedList<>();
         Lesson l = new Lesson();
         l.setStatus(0);
-        List<Lesson> lessons = lessonService.findAll(l);
+        Page<Lesson> lessonPage = lessonService.page(l, 1, 10000);
+        List<Lesson> lessons = lessonPage.getContent();
         count = lessons.size();
+        if (count == 0) {
+            logger.info("over!!!!");
+            return null;
+        }
         logger.info("开始加载lessons,请稍后...,总数量:{}", lessons.size());
         for (int i = 0; i < lessons.size(); i++) {
 
@@ -96,7 +107,7 @@ public class LessonCrawler extends BaseSeimiCrawler {
 
             JXNode script = doc.selNOne(scriptXpath);
             String chapterPath = RegexUtils.filter(script.toString(), CHAPTERPATH, 1);
-            List<String> images = RegexUtils.getArraysFilter(script.toString(), IMAGE, 1);
+            List<Map<String, Object>> images = RegexUtils.getArraysFilter(script.toString(), IMAGE, 1);
             logger.info("meta:{}", meta);
             Lesson lesson = JsonUtils.fromJson((String) meta.get("lesson"), Lesson.class);
             lesson.setPage(images.size());
@@ -107,19 +118,20 @@ public class LessonCrawler extends BaseSeimiCrawler {
             content.setChapterId(lesson.getChapterId());
 
             List<Content.Image> imageList = new ArrayList<>();
-            for (int i = 0; i < images.size(); i++) {
-                String url = rsBaseUrl + "/" + chapterPath + images.get(i);
+            images.parallelStream().forEach(image -> {
+                String img = (String) image.get("image");
+                Integer i = (Integer) image.get("index");
+                String url = rsBaseUrl + "/" + chapterPath + img;
                 logger.info("url:{}", url);
-
                 logger.info("开始下载图片,lesson:{}", lesson);
                 String hash = downloadService.downloadImage(url);
                 logger.info("保存成功");
 
-                Content.Image image = new Content.Image();
-                image.setHash(hash);
-                image.setIndex(i);
-                imageList.add(image);
-            }
+                Content.Image im = new Content.Image();
+                im.setHash(hash);
+                im.setIndex(i);
+                imageList.add(im);
+            });
             content.setImages(imageList);
             contentService.save(content);
             logger.info("保存content,content:{}", content);
@@ -128,6 +140,14 @@ public class LessonCrawler extends BaseSeimiCrawler {
             logger.info("更新lesson,lesson:{}", lesson);
             index++;
             logger.info("进度:{},name:{},url:{}", (float) index / count * 100 + "%", lesson.getName(), lesson.getPage());
+            if (index >= count) {
+                CrawlerModel model = CrawlerCache.getCrawlerModel(this.getCrawlerName());
+                if (model == null) {
+                    logger.error("crawler model name:{}", this.getCrawlerName());
+                    throw new RuntimeException("crawler model is null");
+                }
+                model.startRequest();
+            }
         } catch (Exception e) {
             logger.error("cause:", e);
         }
